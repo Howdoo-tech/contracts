@@ -5,7 +5,7 @@ import '../HowdooERC20.sol';
 
 contract TestMultivest is Multivest, HowdooERC20 {
     function TestMultivest(address allowedMultivest)
-    HowdooERC20(
+    public HowdooERC20(
         1000000,
         "TEST",
         18,
@@ -21,6 +21,6 @@ contract TestMultivest is Multivest, HowdooERC20 {
         return transfer(_address, value);
     }
     function updatePrice() internal {
-        3+6;
+        return;
     }
 }

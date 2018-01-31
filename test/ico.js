@@ -93,8 +93,6 @@ contract('ICO', function (accounts) {
         await ico.setEtherHolder(accounts[3])
             .then(Utils.receiptShouldSucceed);
 
-
-
         await Utils.checkState({ico}, {
             ico: {
                 minInvest: new BigNumber('28000000').valueOf(),

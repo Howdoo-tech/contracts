@@ -1,3 +1,4 @@
+/* solhint-disable */
 // <ORACLIZE_API>
 /*
 Copyright (c) 2015-2016 Oraclize SRL
@@ -27,28 +28,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-/* solhint-disable */
 
-pragma solidity 0.4.18;//please import oraclizeAPI_pre0.4.sol when solidity < 0.4.0
+// This api is currently targeted at 0.4.18, please import oraclizeAPI_pre0.4.sol or oraclizeAPI_0.4 where necessary
+pragma solidity ^0.4.18;
 
 contract OraclizeI {
     address public cbAddress;
-    function query(uint _timestamp, string _datasource, string _arg) payable returns (bytes32 _id);
-    function query_withGasLimit(uint _timestamp, string _datasource, string _arg, uint _gaslimit) payable returns (bytes32 _id);
-    function query2(uint _timestamp, string _datasource, string _arg1, string _arg2) payable returns (bytes32 _id);
-    function query2_withGasLimit(uint _timestamp, string _datasource, string _arg1, string _arg2, uint _gaslimit) payable returns (bytes32 _id);
-    function queryN(uint _timestamp, string _datasource, bytes _argN) payable returns (bytes32 _id);
-    function queryN_withGasLimit(uint _timestamp, string _datasource, bytes _argN, uint _gaslimit) payable returns (bytes32 _id);
-    function getPrice(string _datasource) returns (uint _dsprice);
-    function getPrice(string _datasource, uint gaslimit) returns (uint _dsprice);
-    function useCoupon(string _coupon);
-    function setProofType(byte _proofType);
-    function setConfig(bytes32 _config);
-    function setCustomGasPrice(uint _gasPrice);
-    function randomDS_getSessionPubKeyHash() returns(bytes32);
+    function query(uint _timestamp, string _datasource, string _arg) external payable returns (bytes32 _id);
+    function query_withGasLimit(uint _timestamp, string _datasource, string _arg, uint _gaslimit) external payable returns (bytes32 _id);
+    function query2(uint _timestamp, string _datasource, string _arg1, string _arg2) public payable returns (bytes32 _id);
+    function query2_withGasLimit(uint _timestamp, string _datasource, string _arg1, string _arg2, uint _gaslimit) external payable returns (bytes32 _id);
+    function queryN(uint _timestamp, string _datasource, bytes _argN) public payable returns (bytes32 _id);
+    function queryN_withGasLimit(uint _timestamp, string _datasource, bytes _argN, uint _gaslimit) external payable returns (bytes32 _id);
+    function getPrice(string _datasource) public returns (uint _dsprice);
+    function getPrice(string _datasource, uint gaslimit) public returns (uint _dsprice);
+    function setProofType(byte _proofType) external;
+    function setCustomGasPrice(uint _gasPrice) external;
+    function randomDS_getSessionPubKeyHash() external constant returns(bytes32);
 }
 contract OraclizeAddrResolverI {
-    function getAddress() returns (address _addr);
+    function getAddress() public returns (address _addr);
 }
 contract usingOraclize {
     uint constant day = 60*60*24;
@@ -70,18 +69,24 @@ contract usingOraclize {
 
     OraclizeI oraclize;
     modifier oraclizeAPI {
-        if((address(OAR)==0)||(getCodeSize(address(OAR))==0)) oraclize_setNetwork(networkID_auto);
+        if((address(OAR)==0)||(getCodeSize(address(OAR))==0))
+        oraclize_setNetwork(networkID_auto);
+
+        if(address(oraclize) != OAR.getAddress())
         oraclize = OraclizeI(OAR.getAddress());
+
         _;
     }
     modifier coupon(string code){
         oraclize = OraclizeI(OAR.getAddress());
-        oraclize.useCoupon(code);
         _;
     }
 
-    function oraclize_setNetwork(uint8) internal returns(bool){
-//    function oraclize_setNetwork(uint8 networkID) internal returns(bool){
+    function oraclize_setNetwork(uint8 networkID) internal returns(bool){
+        return oraclize_setNetwork();
+        networkID; // silence the warning and remain backwards compatible
+    }
+    function oraclize_setNetwork() internal returns(bool){
         if (getCodeSize(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed)>0){ //mainnet
             OAR = OraclizeAddrResolverI(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed);
             oraclize_setNetworkName("eth_mainnet");
@@ -117,15 +122,12 @@ contract usingOraclize {
         return false;
     }
 
-    function __callback(bytes32 myid, string result) {
+    function __callback(bytes32 myid, string result) public {
         __callback(myid, result, new bytes(0));
     }
-    function __callback(bytes32, string, bytes) {
-//    function __callback(bytes32 myid, string result, bytes proof) {
-    }
-
-    function oraclize_useCoupon(string code) oraclizeAPI internal {
-        oraclize.useCoupon(code);
+    function __callback(bytes32 myid, string result, bytes proof) public {
+        return;
+        myid; result; proof; // Silence compiler warnings
     }
 
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
@@ -518,9 +520,6 @@ contract usingOraclize {
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
     }
-    function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
-        return oraclize.setConfig(config);
-    }
 
     function oraclize_randomDS_getSessionPubKeyHash() oraclizeAPI internal returns (bytes32){
         return oraclize.randomDS_getSessionPubKeyHash();
@@ -532,7 +531,7 @@ contract usingOraclize {
         }
     }
 
-    function parseAddr(string _a) internal returns (address){
+    function parseAddr(string _a) internal pure returns (address){
         bytes memory tmp = bytes(_a);
         uint160 iaddr = 0;
         uint160 b1;
@@ -552,7 +551,7 @@ contract usingOraclize {
         return address(iaddr);
     }
 
-    function strCompare(string _a, string _b) internal returns (int) {
+    function strCompare(string _a, string _b) internal pure returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
         uint minLength = a.length;
@@ -570,7 +569,7 @@ contract usingOraclize {
         return 0;
     }
 
-    function indexOf(string _haystack, string _needle) internal returns (int) {
+    function indexOf(string _haystack, string _needle) internal pure returns (int) {
         bytes memory h = bytes(_haystack);
         bytes memory n = bytes(_needle);
         if(h.length < 1 || n.length < 1 || (n.length > h.length))
@@ -597,7 +596,7 @@ contract usingOraclize {
         }
     }
 
-    function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string) {
+    function strConcat(string _a, string _b, string _c, string _d, string _e) internal pure returns (string) {
         bytes memory _ba = bytes(_a);
         bytes memory _bb = bytes(_b);
         bytes memory _bc = bytes(_c);
@@ -614,25 +613,25 @@ contract usingOraclize {
         return string(babcde);
     }
 
-    function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
+    function strConcat(string _a, string _b, string _c, string _d) internal pure returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
 
-    function strConcat(string _a, string _b, string _c) internal returns (string) {
+    function strConcat(string _a, string _b, string _c) internal pure returns (string) {
         return strConcat(_a, _b, _c, "", "");
     }
 
-    function strConcat(string _a, string _b) internal returns (string) {
+    function strConcat(string _a, string _b) internal pure returns (string) {
         return strConcat(_a, _b, "", "", "");
     }
 
     // parseInt
-    function parseInt(string _a) internal returns (uint) {
+    function parseInt(string _a) internal pure returns (uint) {
         return parseInt(_a, 0);
     }
 
     // parseInt(parseFloat*10^_b)
-    function parseInt(string _a, uint _b) internal returns (uint) {
+    function parseInt(string _a, uint _b) internal pure returns (uint) {
         bytes memory bresult = bytes(_a);
         uint mint = 0;
         bool decimals = false;
@@ -650,7 +649,7 @@ contract usingOraclize {
         return mint;
     }
 
-    function uint2str(uint i) internal returns (string){
+    function uint2str(uint i) internal pure returns (string){
         if (i == 0) return "0";
         uint j = i;
         uint len;
@@ -667,7 +666,7 @@ contract usingOraclize {
         return string(bstr);
     }
 
-    function stra2cbor(string[] arr) internal returns (bytes) {
+    function stra2cbor(string[] arr) internal pure returns (bytes) {
         uint arrlen = arr.length;
 
         // get correct cbor output length
@@ -690,7 +689,7 @@ contract usingOraclize {
             res[ctr] = 0x5F;
             ctr++;
             for (uint x = 0; x < elemArray[i].length; x++) {
-                // if there"s a bug with larger strings, this may be the culprit
+                // if there's a bug with larger strings, this may be the culprit
                 if (x % 23 == 0) {
                     uint elemcborlen = elemArray[i].length - x >= 24 ? 23 : elemArray[i].length - x;
                     elemcborlen += 0x40;
@@ -709,7 +708,7 @@ contract usingOraclize {
         return res;
     }
 
-    function ba2cbor(bytes[] arr) internal returns (bytes) {
+    function ba2cbor(bytes[] arr) internal pure returns (bytes) {
         uint arrlen = arr.length;
 
         // get correct cbor output length
@@ -757,13 +756,12 @@ contract usingOraclize {
         oraclize_network_name = _network_name;
     }
 
-    function oraclize_getNetworkName() internal returns (string) {
+    function oraclize_getNetworkName() internal view returns (string) {
         return oraclize_network_name;
     }
 
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
-//        if ((_nbytes == 0)||(_nbytes > 32)) throw;
-        require(_nbytes != 0 && _nbytes < 32);
+        require((_nbytes > 0) && (_nbytes <= 32));
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -777,7 +775,7 @@ contract usingOraclize {
         }
         bytes[3] memory args = [unonce, nbytes, sessionKeyHash];
         bytes32 queryId = oraclize_query(_delay, "random", args, _customGasLimit);
-        oraclize_randomDS_setCommitment(queryId, sha3(bytes8(_delay), args[1], sha256(args[0]), args[2]));
+        oraclize_randomDS_setCommitment(queryId, keccak256(bytes8(_delay), args[1], sha256(args[0]), args[2]));
         return queryId;
     }
 
@@ -809,10 +807,10 @@ contract usingOraclize {
 
 
         (sigok, signer) = safer_ecrecover(tosignh, 27, sigr, sigs);
-        if (address(sha3(pubkey)) == signer) return true;
+        if (address(keccak256(pubkey)) == signer) return true;
         else {
             (sigok, signer) = safer_ecrecover(tosignh, 28, sigr, sigs);
-            return (address(sha3(pubkey)) == signer);
+            return (address(keccak256(pubkey)) == signer);
         }
     }
 
@@ -827,8 +825,7 @@ contract usingOraclize {
         copyBytes(proof, 3+1, 64, appkey1_pubkey, 0);
 
         bytes memory tosign2 = new bytes(1+65+32);
-//        tosign2[0] = 1; //role
-        tosign2[0] = 0x1; //role
+        tosign2[0] = byte(1); //role
         copyBytes(proof, sig2offset-65, 65, tosign2, 1);
         bytes memory CODEHASH = hex"fd94fa71bc0ba10d39d464d0d8f465efeef0a2764e3887fcc9df41ded20f505c";
         copyBytes(CODEHASH, 0, 32, tosign2, 1+65);
@@ -854,12 +851,10 @@ contract usingOraclize {
 
     modifier oraclize_randomDS_proofVerify(bytes32 _queryId, string _result, bytes _proof) {
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
-//        if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) throw;
-        require(_proof[0] == "L" && _proof[1] == "P" && _proof[2] == 1);
+        require((_proof[0] == "L") && (_proof[1] == "P") && (_proof[2] == 1));
 
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
-//        if (proofVerified == false) throw;
-        require(proofVerified == true);
+        require(proofVerified);
 
         _;
     }
@@ -874,11 +869,11 @@ contract usingOraclize {
         return 0;
     }
 
-    function matchBytes32Prefix(bytes32 content, bytes prefix) internal returns (bool){
+    function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
 
-//        for (var i=0; i<prefix.length; i++){
-        for (var i=uint8(0); i<prefix.length; i++){
+
+        for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
 
@@ -886,26 +881,20 @@ contract usingOraclize {
     }
 
     function oraclize_randomDS_proofVerify__main(bytes proof, bytes32 queryId, bytes result, string context_name) internal returns (bool){
-        bool checkok;
-
 
         // Step 2: the unique keyhash has to match with the sha256 of (context name + queryId)
         uint ledgerProofLength = 3+65+(uint(proof[3+65+1])+2)+32;
         bytes memory keyhash = new bytes(32);
         copyBytes(proof, ledgerProofLength, 32, keyhash, 0);
-        checkok = (sha3(keyhash) == sha3(sha256(context_name, queryId)));
-        if (checkok == false) return false;
+        if (!(keccak256(keyhash) == keccak256(sha256(context_name, queryId)))) return false;
 
         bytes memory sig1 = new bytes(uint(proof[ledgerProofLength+(32+8+1+32)+1])+2);
         copyBytes(proof, ledgerProofLength+(32+8+1+32), sig1.length, sig1, 0);
 
-
         // Step 3: we assume sig1 is valid (it will be verified during step 5) and we verify if 'result' is the prefix of sha256(sig1)
-        checkok = matchBytes32Prefix(sha256(sig1), result);
-        if (checkok == false) return false;
+        if (!matchBytes32Prefix(sha256(sig1), result, uint(proof[ledgerProofLength+32+8]))) return false;
 
-
-        // Step 4: commitment match verification, sha3(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
+        // Step 4: commitment match verification, keccak256(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
         // This is to verify that the computed args match with the ones specified in the query.
         bytes memory commitmentSlice1 = new bytes(8+1+32);
         copyBytes(proof, ledgerProofLength+32, 8+1+32, commitmentSlice1, 0);
@@ -915,7 +904,7 @@ contract usingOraclize {
         copyBytes(proof, sig2offset-64, 64, sessionPubkey, 0);
 
         bytes32 sessionPubkeyHash = sha256(sessionPubkey);
-        if (oraclize_randomDS_args[queryId] == sha3(commitmentSlice1, sessionPubkeyHash)){ //unonce, nbytes and sessionKeyHash match
+        if (oraclize_randomDS_args[queryId] == keccak256(commitmentSlice1, sessionPubkeyHash)){ //unonce, nbytes and sessionKeyHash match
             delete oraclize_randomDS_args[queryId];
         } else return false;
 
@@ -923,8 +912,7 @@ contract usingOraclize {
         // Step 5: validity verification for sig1 (keyhash and args signed with the sessionKey)
         bytes memory tosign1 = new bytes(32+8+1+32);
         copyBytes(proof, ledgerProofLength, 32+8+1+32, tosign1, 0);
-        checkok = verifySig(sha256(tosign1), sig1, sessionPubkey);
-        if (checkok == false) return false;
+        if (!verifySig(sha256(tosign1), sig1, sessionPubkey)) return false;
 
         // verify if sessionPubkeyHash was verified already, if not.. let's do it!
         if (oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] == false){
@@ -934,16 +922,12 @@ contract usingOraclize {
         return oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash];
     }
 
-
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
-    function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset) internal returns (bytes) {
+    function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset) internal pure returns (bytes) {
         uint minLength = length + toOffset;
 
-//        if (to.length < minLength) {
-            // Buffer too small
-//            throw; // Should be a better way?
-//        }
-        require(to.length > minLength);
+        // Buffer too small
+        require(to.length >= minLength); // Should be a better way?
 
         // NOTE: the offset 32 is added to skip the `size` field of both bytes variables
         uint i = 32 + fromOffset;
@@ -1015,22 +999,22 @@ contract usingOraclize {
         // 'byte' is not working due to the Solidity parser, so lets
         // use the second best option, 'and'
         // v := and(mload(add(sig, 65)), 255)
+        }
+
+        // albeit non-transactional signatures are not specified by the YP, one would expect it
+        // to match the YP range of [27, 28]
+        //
+        // geth uses [0, 1] and some clients have followed. This might change, see:
+        //  https://github.com/ethereum/go-ethereum/issues/2053
+        if (v < 27)
+        v += 27;
+
+        if (v != 27 && v != 28)
+        return (false, 0);
+
+        return safer_ecrecover(hash, v, r, s);
     }
 
-// albeit non-transactional signatures are not specified by the YP, one would expect it
-// to match the YP range of [27, 28]
-//
-// geth uses [0, 1] and some clients have followed. This might change, see:
-//  https://github.com/ethereum/go-ethereum/issues/2053
-if (v < 27)
-v += 27;
-
-if (v != 27 && v != 28)
-return (false, 0);
-
-return safer_ecrecover(hash, v, r, s);
 }
-
-}
-/* solhint-enable */
+/* solhint-enabled */
 // </ORACLIZE_API>

@@ -1,369 +1,327 @@
-// var Uptick = artifacts.require('./CnatICO.sol'),
-//     Token = artifacts.require('./Cnat.sol'),
-//     UptickAllocation = artifacts.require('./CnatTokenAllocation.sol'),
-//     TestUptickAllocation = artifacts.require('./test/TestCnatTokenAllocation.sol'),
-//     BigNumber = require('bignumber.js'),
-//     precision = new BigNumber(1000000000000000000),
-//     Utils = require('./utils');
-//
-// var SigAddress = web3.eth.accounts[1],
-//     etherHolderAddress = web3.eth.accounts[3],
-//     monthSeconds = 2629744,
-//     UptickContract,
-//     UptickAllocationContract,
-//     UptickToken;
-//
-// function deploy(ICOSince, softCap, hardCap) {
-//
-//     return Token.new(
-//         new BigNumber(130000000).mul(precision),//maxSupply
-//         'TIC',
-//         'TIC',
-//         18,
-//         false
-//     )
-//         .then((_instance) => UptickToken = _instance)
-//         .then(() => {
-//             return Uptick.new(
-//                 UptickToken.address,
-//                 etherHolderAddress,
-//                 SigAddress,
-//                 softCap,//softCap
-//                 hardCap,//hardCap
-//                 ICOSince,//_icoSince
-//                 new BigNumber(500000000000000)//_tokenPrice
-//             )
-//         })
-//         .then((_instance) => UptickContract = _instance)
-//         .then(() => UptickContract.setCnat(UptickToken.address))
-//         .then(() => UptickContract.setAllowedMultivest(UptickContract.address))
-//         .then(() => UptickToken.setCnatICO(UptickContract.address))
-//         .then(() => UptickToken.addMinter(UptickContract.address))
-//         .then(() => {
-//             return TestUptickAllocation.new(
-//                 UptickContract.address,
-//                 UptickToken.address,
-//                 8,//teamsPercentage
-//                 12,//teamsPeriod
-//                 3,//teamCliff
-//                 [
-//                     web3.eth.accounts[10],
-//                     web3.eth.accounts[11],
-//                 ],//teamAddresses
-//                 5,//rewardsPercentage
-//                 [
-//                     web3.eth.accounts[21],
-//                     web3.eth.accounts[22],
-//                 ],//rewardsAddresses
-//                 7,//partnersPercentage
-//                 [
-//                     web3.eth.accounts[31],
-//                     web3.eth.accounts[32],
-//                 ],//partnersAddresses
-//             )
-//         })
-//         .then((result) => UptickAllocationContract = result)
-//         .then(() => UptickToken.addMinter(UptickAllocationContract.address))
-// }
-//
-// contract('UptickTokenAllocation', function (accounts) {
-//
-//     it('deploy & check "rewards" and "partners" allocation', async function () {
-//         var ICOSince = parseInt(new Date().getTime() / 1000),
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//
-//         await deploy(ICOSince, softCap, hardCap)
-//             .then(() => {
-//                 return UptickAllocationContract.allocateTokens();
-//             })
-//             .then(Utils.receiptShouldSucceed)
-//             //rewardsPercentage 130000000 * 5 / 100 = 6500000 | / 2 = 3250000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[21], new BigNumber('3250000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[22], new BigNumber('3250000').mul(precision).valueOf()))
-//             //partnersPercentage 130000000 * 7 / 100 = 9100000 | / 2 = 4550000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[31], new BigNumber('4550000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[32], new BigNumber('4550000').mul(precision).valueOf()))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.allocateTokens();
-//             })
-//             .then(Utils.receiptShouldSucceed)
-//
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[21], new BigNumber('3250000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[22], new BigNumber('3250000').mul(precision).valueOf()))
-//
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[31], new BigNumber('4550000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[32], new BigNumber('4550000').mul(precision).valueOf()))
-//             // 5% + 7% + 80% = 92
-//             // 6500000 + 9100000 + 104000000 = 119600000 | 130000000 - 119600000 = 10400000 | 10400000 * 100 / 130000000 = 8%
-//
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber(0).mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber(0).mul(precision).valueOf()))
-//     });
-//
-//     it('deploy & check vesting allocation 1', async function () {
-//         var ICOSince = parseInt(new Date().getTime() / 1000) - monthSeconds * 3,
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//
-//         await deploy(ICOSince, softCap, hardCap)
-//             .then(() => UptickAllocationContract.allocateTokens())
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 3/12 = 1300000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('1300000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('1300000').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.allocateTokens())
-//             .then(Utils.receiptShouldSucceed)
-//
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('1300000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('1300000').mul(precision).valueOf()))
-//
-//             .then(() => UptickContract.setICOPeriod(ICOSince - monthSeconds * 3, ICOSince + monthSeconds * 3))
-//
-//             .then(() => UptickContract.startTime.call())
-//             .then((result) => assert.equal(result.valueOf(), ICOSince - monthSeconds * 3, 'ICOSince is not equal'))
-//
-//             .then(() => UptickContract.endTime.call())
-//             .then((result) => assert.equal(result.valueOf(), ICOSince + monthSeconds * 3, 'ICOTill is not equal'))
-//     });
-//
-//     it('deploy & check vesting allocation 2', async function () {
-//         var ICOSince = parseInt(new Date().getTime() / 1000) - monthSeconds * 6,
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//         await deploy(ICOSince, softCap, hardCap)
-//             .then(() => UptickAllocationContract.allocateTokens())
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 6/12 = 2600000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('2600000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('2600000').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.allocateTokens())
-//             .then(Utils.receiptShouldSucceed)
-//
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('2600000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('2600000').mul(precision).valueOf()))
-//     });
-//
-//     it('deploy & check vesting allocation 3', async function () {
-//         var ICOSince = parseInt(new Date().getTime() / 1000) - monthSeconds * 18,
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//         await deploy(ICOSince, softCap, hardCap)
-//             .then(() => UptickAllocationContract.allocateTokens())
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 15/12 = 5200000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('5200000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('5200000').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.allocateTokens())
-//             .then(Utils.receiptShouldSucceed)
-//
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('5200000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('5200000').mul(precision).valueOf()))
-//     });
-//
-//     it('deploy & check vesting allocation 4', async function () {
-//         var ICOSince = parseInt(new Date().getTime() / 1000),
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//         await deploy(ICOSince, softCap, hardCap)
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('0').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('0').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000)))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('0').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('0').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 4))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 3/12 = 1300000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('1300000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('1300000').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 4))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 3/12 = 1300000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('1300000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('1300000').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 7))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 6/12 = 2600000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('2600000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('2600000').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 10))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 9/12 = 3900000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('3900000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('3900000').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 13))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 12/12 = 5200000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('5200000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('5200000').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 16))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 15/12 = 5200000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('5200000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('5200000').mul(precision).valueOf()))
-//     });
-//
-//     it('deploy & check vesting allocation 5', async function () {
-//         var ICOSince = parseInt(new Date().getTime() / 1000),
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//         await deploy(ICOSince, softCap, hardCap)
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('0').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('0').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 9))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 9/12 = 3900000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('3900000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('3900000').mul(precision).valueOf()))
-//             //
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 18))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 12/12 = 5200000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('5200000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('5200000').mul(precision).valueOf()))
-//
-//     });
-//
-//     it('deploy & check vesting allocation 6', async function () {
-//         var ICOSince = parseInt(new Date().getTime() / 1000),
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//         await deploy(ICOSince, softCap, hardCap)
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('0').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('0').mul(precision).valueOf()))
-//
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 10))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 10/12 = 3900000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('3900000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('3900000').mul(precision).valueOf()))
-//             //
-//             .then(() => UptickAllocationContract.testAllocateTokens(parseInt(new Date().getTime() / 1000) + monthSeconds * 12))
-//             .then(Utils.receiptShouldSucceed)
-//
-//             // 10400000 / 2 = 5200000 | 5200000 * 12/12 = 5200000
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[10], new BigNumber('5200000').mul(precision).valueOf()))
-//             .then(() => Utils.balanceShouldEqualTo(UptickToken, accounts[11], new BigNumber('5200000').mul(precision).valueOf()))
-//
-//     });
-//
-//     it("test setTeamAllocation && setAllocation functions", async function () {
-//         let ICOSince = parseInt(new Date().getTime() / 1000) - monthSeconds * 15,
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//             await deploy(ICOSince, softCap, hardCap)
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetTeamAllocation.call(8, 12, 3, [accounts[10], accounts[11]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), true, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetTeamAllocation.call(0, 12, 3, [accounts[10], accounts[11]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetTeamAllocation.call(101, 12, 3, [accounts[10], accounts[11]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetTeamAllocation.call(8, 0, 3, [accounts[10], accounts[11]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetTeamAllocation.call(8, 12, 0, [accounts[10], accounts[11]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetTeamAllocation.call(8, 12, 15, [accounts[10], accounts[11]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetTeamAllocation.call(8, 12, 3, [])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetAllocation.call(5, [accounts[21], accounts[22]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), true, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetAllocation.call(0, [accounts[21], accounts[22]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetAllocation.call(101, [accounts[21], accounts[22]])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//
-//             .then(() => {
-//                 return UptickAllocationContract.checkSetAllocation.call(5, [])
-//             })
-//             .then((result) => assert.equal(result.valueOf(), false, 'check value is not equal'))
-//     });
-//
-//     it("check setCnat & seCnatICO", async function () {
-//         let ICOSince = parseInt(new Date().getTime() / 1000) - monthSeconds * 15,
-//             softCap = new BigNumber(10000).mul(2400).mul(precision),
-//             hardCap = new BigNumber((40000 * 2000) + (10000 * 2400)).mul(precision);
-//             await deploy(ICOSince, softCap, hardCap)
-//
-//                 //check setCnat
-//             .then(() => UptickAllocationContract.setCnat(accounts[8], {from: accounts[1]}))
-//                 .then(Utils.receiptShouldFailed)
-//                 .catch(Utils.catchReceiptShouldFailed)
-//
-//             .then(() => UptickAllocationContract.setCnat(0))
-//                 .then(Utils.receiptShouldFailed)
-//                 .catch(Utils.catchReceiptShouldFailed)
-//
-//             .then(() => UptickAllocationContract.setCnat(accounts[8]))
-//                 .then(Utils.receiptShouldSucceed)
-//                 //check setCnatICO
-//             .then(() => UptickAllocationContract.setCnatICO(accounts[8], {from: accounts[1]}))
-//                 .then(Utils.receiptShouldFailed)
-//                 .catch(Utils.catchReceiptShouldFailed)
-//
-//             .then(() => UptickAllocationContract.setCnatICO(0))
-//                 .then(Utils.receiptShouldFailed)
-//                 .catch(Utils.catchReceiptShouldFailed)
-//
-//             .then(() => UptickAllocationContract.setCnatICO(accounts[8]))
-//                 .then(Utils.receiptShouldSucceed)
-//
-//     });
-//
-// });
+var ICO = artifacts.require("./test/TestICO.sol"),
+    Howdoo = artifacts.require("./test/TestHowdoo.sol"),
+    Allocations = artifacts.require("./test/TestHowdooAllocation.sol"),
+
+    Utils = require("./utils"),
+    BigNumber = require('bignumber.js'),
+
+    precision = new BigNumber("1000000000000000000"),
+    icoSince = parseInt(new Date().getTime() / 1000) - 3600,
+    icoTill = parseInt(new Date().getTime() / 1000) + 3600,
+    monthSeconds = 2629744,
+
+    treasuryAddress = web3.eth.accounts[0],
+    hisAddress = web3.eth.accounts[0],
+    bountyAddress = web3.eth.accounts[0],
+    allowedAddress = web3.eth.accounts[7],
+    multivestAddress = web3.eth.accounts[8],
+    etherHolder = web3.eth.accounts[9];
+
+function makeTransaction(instance, value, add, from) {
+    "use strict";
+    return instance.multivestBuy(add, value, {from: from});
+}
+
+async function deploy() {
+    const howdoo = await Howdoo.new(
+        treasuryAddress,
+        hisAddress,
+        bountyAddress,
+        allowedAddress,
+        false
+    );
+
+    const ico = await ICO.new(
+        multivestAddress,
+        howdoo.address,
+        etherHolder,
+        icoSince,// _startTime,
+        icoTill, //_endTime,
+        new BigNumber('119493000').valueOf(),//1,194.930008
+        new BigNumber('25000000').valueOf(),//25000000
+        new BigNumber('311111110.8').mul(precision).valueOf(),//_maxTokenSupply
+    );
+
+    const allocation = await Allocations.new(
+        howdoo.address,
+        ico.address
+    );
+
+    await howdoo.addMinter(ico.address);
+    await howdoo.addMinter(allocation.address);
+    await howdoo.setICO(ico.address);
+
+    return {howdoo, ico, allocation};
+}
+
+contract('ICO', function (accounts) {
+/*
+    it('deploy & check constructor info & setHowdoo & setICO', async function () {
+        const {howdoo, ico, allocation} = await deploy();
+
+        await Utils.checkState({allocation}, {
+            allocation: {
+                howdoo: howdoo.address,
+                ico: ico.address,
+                remainingTokens: new BigNumber('88888888.8').mul(precision).valueOf()
+            }
+        });
+
+        await allocation.setHowdoo(accounts[2], {from: accounts[1]})
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+        await allocation.setHowdoo(0x0)
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+        await allocation.setHowdoo(accounts[2])
+            .then(Utils.receiptShouldSucceed);
+
+        await allocation.setICO(accounts[2], {from: accounts[1]})
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+        await allocation.setICO(0x0)
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+        await allocation.setICO(accounts[2])
+            .then(Utils.receiptShouldSucceed);
+
+        await Utils.checkState({allocation}, {
+            allocation: {
+                howdoo: accounts[2],
+                ico: accounts[2],
+                remainingTokens: new BigNumber('88888888.8').mul(precision).valueOf()
+            }
+        });
+    });
+
+    it('check Allocation & claim & allocate', async function () {
+        const {howdoo, ico, allocation} = await deploy();
+
+        await Utils.checkState({allocation}, {
+            allocation: {
+                howdoo: howdoo.address,
+                ico: ico.address,
+                remainingTokens: new BigNumber('88888888.8').mul(precision).valueOf()
+            }
+        });
+
+        assert.equal(await allocation.testGetAllocationsLength.call(), 1, "AllocationsLength is not equal");
+
+        let allocationData = await allocation.testGetAllocationById.call(0);
+        assert.equal(allocationData[0], accounts[0], "allocationData address is not equal");
+        assert.equal(allocationData[1], new BigNumber('101210666.57').mul(precision).valueOf(), "allocationData tokens is not equal");
+        assert.equal(allocationData[2], false, "allocationData sent is not equal");
+
+        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+            accounts[0],
+            accounts[1],
+            accounts[2],
+        ], {from: accounts[5]})
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+
+        await allocation.setAllocation(new BigNumber('0').mul(precision).valueOf(),[
+            accounts[0],
+            accounts[1],
+            accounts[2],
+        ])
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+
+        await allocation.testChangeRemainingTokens(0);
+        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+            accounts[0],
+            accounts[1],
+            accounts[2],
+        ])
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+        await allocation.testChangeRemainingTokens(new BigNumber('88888888.8').mul(precision).valueOf());
+
+        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[])
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+
+        await allocation.testChangeRemainingTokens(new BigNumber('1').valueOf());
+        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+            accounts[0],
+            accounts[1],
+            accounts[2],
+        ])
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+        await allocation.testChangeRemainingTokens(new BigNumber('88888888.8').mul(precision).valueOf());
+
+        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+            accounts[0],
+            0x0,
+            accounts[2],
+        ])
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+
+        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+            accounts[1],
+            accounts[2],
+            accounts[3],
+        ])
+            .then(Utils.receiptShouldSucceed);
+
+        await allocation.claim({from: accounts[2]})
+            .then(Utils.receiptShouldSucceed);
+
+        allocationData = await allocation.testGetAllocationById.call(0);
+        assert.equal(allocationData[2], false, "allocationData sent is not equal");
+        allocationData = await allocation.testGetAllocationById.call(1);
+        assert.equal(allocationData[2], false, "allocationData sent is not equal");
+        allocationData = await allocation.testGetAllocationById.call(2);
+        assert.equal(allocationData[2], true, "allocationData sent is not equal");
+        allocationData = await allocation.testGetAllocationById.call(3);
+        assert.equal(allocationData[2], false, "allocationData sent is not equal");
+
+        await Utils.checkState({allocation, howdoo}, {
+            allocation: {
+                howdoo: howdoo.address,
+                ico: ico.address,
+                remainingTokens: new BigNumber('88888888.8').mul(precision).sub(new BigNumber('30000').mul(precision)).valueOf()
+            },
+            howdoo: {
+                balanceOf: [
+                    {[accounts[0]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[2]]: new BigNumber('10000').mul(precision).valueOf()},
+                    {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
+                ],
+            }
+        });
+
+        await allocation.claim({from: accounts[2]})
+            .then(Utils.receiptShouldSucceed);
+
+        await Utils.checkState({allocation, howdoo}, {
+            allocation: {
+                howdoo: howdoo.address,
+                ico: ico.address,
+                remainingTokens: new BigNumber('88888888.8').mul(precision).sub(new BigNumber('30000').mul(precision)).valueOf()
+            },
+            howdoo: {
+                balanceOf: [
+                    {[accounts[0]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[2]]: new BigNumber('10000').mul(precision).valueOf()},
+                    {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
+                ],
+            }
+        });
+
+        await allocation.allocate({from: accounts[2]})
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+
+        await allocation.allocate()
+            .then(Utils.receiptShouldSucceed);
+
+        await Utils.checkState({allocation, howdoo}, {
+            allocation: {
+                howdoo: howdoo.address,
+                ico: ico.address,
+                remainingTokens: new BigNumber('88888888.8').mul(precision).sub(new BigNumber('30000').mul(precision)).valueOf()
+            },
+            howdoo: {
+                balanceOf: [
+                    {[accounts[0]]: new BigNumber('101210666.57').mul(precision).valueOf()},
+                    {[accounts[1]]: new BigNumber('10000').mul(precision).valueOf()},
+                    {[accounts[2]]: new BigNumber('10000').mul(precision).valueOf()},
+                    {[accounts[3]]: new BigNumber('10000').mul(precision).valueOf()},
+                ],
+            }
+        });
+
+        allocationData = await allocation.testGetAllocationById.call(0);
+        assert.equal(allocationData[2], true, "allocationData sent is not equal");
+        allocationData = await allocation.testGetAllocationById.call(1);
+        assert.equal(allocationData[2], true, "allocationData sent is not equal");
+        allocationData = await allocation.testGetAllocationById.call(2);
+        assert.equal(allocationData[2], true, "allocationData sent is not equal");
+        allocationData = await allocation.testGetAllocationById.call(3);
+        assert.equal(allocationData[2], true, "allocationData sent is not equal");
+    });
+*/
+    it('check vesting allocations', async function () {
+        const {howdoo, ico, allocation} = await deploy();
+
+        await Utils.checkState({allocation, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[2]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[4]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[5]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[6]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[7]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[8]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[9]]: new BigNumber('0').mul(precision).valueOf()},
+                ],
+            }
+        });
+
+        allocation.allocate()
+            .then(Utils.receiptShouldSucceed);
+        await Utils.checkState({allocation, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[2]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[4]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[5]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[6]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[7]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[8]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[9]]: new BigNumber('0').mul(precision).valueOf()},
+                ],
+            }
+        });
+
+        allocation.testAllocate(parseInt(new Date().getTime() / 1000) + monthSeconds - 100000)
+            .then(Utils.receiptShouldSucceed);
+        await Utils.checkState({allocation, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[2]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[4]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[5]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[6]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[7]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[8]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[9]]: new BigNumber('0').mul(precision).valueOf()},
+                ],
+            }
+        });
+
+        await ico.testChangeICOPeriod(icoSince - monthSeconds, icoTill);
+        allocation.testAllocate(parseInt(new Date().getTime() / 1000) + monthSeconds)
+            .then(Utils.receiptShouldSucceed);
+
+        await Utils.checkState({allocation, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[2]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[4]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[5]]: new BigNumber('22469135833333333333333').valueOf()},
+                    {[accounts[6]]: new BigNumber('26790123333333333333333').valueOf()},
+                    {[accounts[7]]: new BigNumber('4148148055555555555555').valueOf()},
+                    {[accounts[8]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[9]]: new BigNumber('0').mul(precision).valueOf()},
+                ],
+            }
+        });
+
+    });
+
+});

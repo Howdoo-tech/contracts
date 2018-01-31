@@ -13,8 +13,7 @@ contract TestICO is ICO {
         uint256 _etherPriceInUSD,
         uint256 _minInvest,
         uint256 _maxTokenSupply //uint256(150000000).mul(10 ** 18)
-)
-    ICO(
+) public ICO(
         _multivestAddress,
         _howdoo,
         _etherHolder,
@@ -36,7 +35,7 @@ contract TestICO is ICO {
         soldTokens = _sold;
     }
 
-    function testCalculateTokensAmount(uint256 _value, uint256 _soldTokens) public constant returns (uint256) {
+    function testCalculateTokensAmount(uint256 _value, uint256 _soldTokens) public returns (uint256) {
         soldTokens = _soldTokens;
 
         return calculateTokensAmount(_value);
