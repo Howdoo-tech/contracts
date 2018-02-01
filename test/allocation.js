@@ -10,10 +10,10 @@ var ICO = artifacts.require("./test/TestICO.sol"),
     icoTill = parseInt(new Date().getTime() / 1000) + 3600,
     monthSeconds = 2629744,
 
-    treasuryAddress = web3.eth.accounts[0],
-    hisAddress = web3.eth.accounts[0],
-    bountyAddress = web3.eth.accounts[0],
-    allowedAddress = web3.eth.accounts[7],
+    treasuryAddress = web3.eth.accounts[8],
+    hisAddress = web3.eth.accounts[8],
+    bountyAddress = web3.eth.accounts[8],
+    allowedAddress = web3.eth.accounts[8],
     multivestAddress = web3.eth.accounts[8],
     etherHolder = web3.eth.accounts[9];
 
@@ -54,8 +54,8 @@ async function deploy() {
     return {howdoo, ico, allocation};
 }
 
-contract('ICO', function (accounts) {
-/*
+contract('Allocations + vesting allocation', function (accounts) {
+
     it('deploy & check constructor info & setHowdoo & setICO', async function () {
         const {howdoo, ico, allocation} = await deploy();
 
@@ -246,7 +246,7 @@ contract('ICO', function (accounts) {
         allocationData = await allocation.testGetAllocationById.call(3);
         assert.equal(allocationData[2], true, "allocationData sent is not equal");
     });
-*/
+
     it('check vesting allocations', async function () {
         const {howdoo, ico, allocation} = await deploy();
 
@@ -260,7 +260,7 @@ contract('ICO', function (accounts) {
                     {[accounts[5]]: new BigNumber('0').mul(precision).valueOf()},
                     {[accounts[6]]: new BigNumber('0').mul(precision).valueOf()},
                     {[accounts[7]]: new BigNumber('0').mul(precision).valueOf()},
-                    {[accounts[8]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[8]]: new BigNumber('311111110800000000000000000').valueOf()},
                     {[accounts[9]]: new BigNumber('0').mul(precision).valueOf()},
                 ],
             }
@@ -278,7 +278,7 @@ contract('ICO', function (accounts) {
                     {[accounts[5]]: new BigNumber('0').mul(precision).valueOf()},
                     {[accounts[6]]: new BigNumber('0').mul(precision).valueOf()},
                     {[accounts[7]]: new BigNumber('0').mul(precision).valueOf()},
-                    {[accounts[8]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[8]]: new BigNumber('311111110800000000000000000').valueOf()},
                     {[accounts[9]]: new BigNumber('0').mul(precision).valueOf()},
                 ],
             }
@@ -296,7 +296,7 @@ contract('ICO', function (accounts) {
                     {[accounts[5]]: new BigNumber('0').mul(precision).valueOf()},
                     {[accounts[6]]: new BigNumber('0').mul(precision).valueOf()},
                     {[accounts[7]]: new BigNumber('0').mul(precision).valueOf()},
-                    {[accounts[8]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[8]]: new BigNumber('311111110800000000000000000').valueOf()},
                     {[accounts[9]]: new BigNumber('0').mul(precision).valueOf()},
                 ],
             }
@@ -316,7 +316,7 @@ contract('ICO', function (accounts) {
                     {[accounts[5]]: new BigNumber('22469135833333333333333').valueOf()},
                     {[accounts[6]]: new BigNumber('26790123333333333333333').valueOf()},
                     {[accounts[7]]: new BigNumber('4148148055555555555555').valueOf()},
-                    {[accounts[8]]: new BigNumber('0').mul(precision).valueOf()},
+                    {[accounts[8]]: new BigNumber('311111110800000000000000000').valueOf()},
                     {[accounts[9]]: new BigNumber('0').mul(precision).valueOf()},
                 ],
             }
