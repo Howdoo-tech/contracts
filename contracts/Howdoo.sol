@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity 0.4.19;
 
 
 import "./MintingERC20.sol";
@@ -96,7 +96,7 @@ contract Howdoo is MintingERC20 {
         bountyAddress = _bountyAddress;
         hisAddress = _hisAddress;
 
-        uint256 amount = uint(1677777776).mul(uint(10) ** uint(decimals - 1));
+        uint256 amount = uint(19111111092).mul(uint(10) ** uint(decimals - 2));
 
         bool status = super.mint(_hisAddress, amount) == amount;
 
@@ -106,7 +106,7 @@ contract Howdoo is MintingERC20 {
         }
 
         if (status) {
-            amount = uint(1333333332).mul(uint(10) ** uint(decimals - 1));
+            amount = uint(1777777776).mul(uint(10) ** uint(decimals - 1));
             status = super.mint(treasuryAddress, amount) == amount;
         }
 

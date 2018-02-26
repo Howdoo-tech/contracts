@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity 0.4.19;
 
 
 import "./Howdoo.sol";
@@ -155,7 +155,7 @@ contract SellableToken is Multivest {
     }
 
     function mintInternal(address _address, uint256 _tokenAmount) internal returns (uint256) {
-        if (howdoo.balanceOf(_address) == 0) {
+        if (howdoo.balanceOf(_address) == 0) {//todo
             investors.push(_address);
         }
         uint256 mintedAmount = howdoo.mint(_address, _tokenAmount);

@@ -20,7 +20,5 @@ contract TestMultivest is Multivest, HowdooERC20 {
     function buy(address _address, uint256 value) internal returns (bool) {
         return transfer(_address, value);
     }
-    function updatePrice() internal {
-        return;
-    }
+
 }

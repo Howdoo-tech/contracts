@@ -42,6 +42,8 @@ async function deploy() {
 
     await howdoo.addMinter(ico.address);
     await howdoo.setICO(ico.address);
+    await ico.updateWhitelist(web3.eth.accounts[0], true);
+    await ico.updateWhitelist(web3.eth.accounts[1], true);
 
     return {howdoo, ico};
 }
@@ -135,21 +137,21 @@ contract('ICO', function (accounts) {
         });
 
         //1 token = 1 ether * etherInUsd / tier.price
-        //10 ^ 18 * 119493000 / 7000 = 17070428571428571428571.4285714285714286
+        //10 ^ 18 * 119493000 / 5000 = 23898600000000000000000
         assert.equal(await ico.testCalculateTokensAmount.call(
             new BigNumber('1').mul(precision).valueOf(),
             new BigNumber('0').valueOf()
-        ), new BigNumber('17070428571428571428571').valueOf(), "value is not equal");
+        ), new BigNumber('23898600000000000000000').valueOf(), "value is not equal");
 
         //1 token = 1 ether * etherInUsd / tier.price
-        //10 ^ 18 * 119493000 / 7000 = 17070428571428571428571.4285714285714286 | 17070 tokens
-        //(10 ^ 18 * (7000 * 1000)) / 119493000 = 58580837371226766.4214640188128175
-        //((10 ^ 18) - 58580837371226766) * 119493000 / 9000 = 12499222222222222227818
-        //13499222222222222227818
+        //10 ^ 18 * 119493000 / 5000 = 23898600000000000000000 | 23898.6 tokens
+        //(10 ^ 18 * (5000 * 1000)) / 119493000 = 41843455265161976.0153314420091553
+        //((10 ^ 18) - 41843455265161976) * 119493000 / 8000 = 14311625000000000000229
+        //14311625000000000000229 + 1000 * 10 ^ 18 = 15311625000000000000229
         assert.equal(await ico.testCalculateTokensAmount.call(
             new BigNumber('1').mul(precision).valueOf(),
             new BigNumber('44443444.4').mul(precision).valueOf()
-        ), new BigNumber('13499222222222222227818').valueOf(), "value is not equal");
+        ), new BigNumber('15311625000000000000229').valueOf(), "value is not equal");
 
         //check minInvest
         //250 usd | 1194.93usd
@@ -162,11 +164,11 @@ contract('ICO', function (accounts) {
         //check minInvest
         //250 usd | 1194.93usd
         //250 * 10 ^ 18 / 1194.93 = 209217276325809880.0766572100457767
-        //209217276325809880 * 119493000 / 7000 = 3571428571428571427262.8571428571428571
+        //209217276325809880 * 119493000 / 5000 = 4999999999999999998168
         assert.equal(await ico.testCalculateTokensAmount.call(
             new BigNumber('209217276325809880').valueOf(),
             new BigNumber('0').mul(precision).valueOf()
-        ), new BigNumber('3571428571428571427262').valueOf(), "value is not equal");
+        ), new BigNumber('4999999999999999998168').valueOf(), "value is not equal");
 
         let ethBalanceEtherHolder = await Utils.getEtherBalance(etherHolder).valueOf();
 
@@ -180,7 +182,7 @@ contract('ICO', function (accounts) {
                 startTime: icoSince,
                 endTime: icoTill,
                 maxTokenSupply: new BigNumber('311111110.8').mul(precision).valueOf(),
-                soldTokens: new BigNumber('17070428571428571428571').valueOf(),
+                soldTokens: new BigNumber('23898600000000000000000').valueOf(),
                 collectedEthers: new BigNumber('1').mul(precision).valueOf(),
                 etherPriceInUSD: new BigNumber('119493000').valueOf(),
                 etherHolder: etherHolder,
@@ -191,7 +193,7 @@ contract('ICO', function (accounts) {
             },
             howdoo: {
                 balanceOf: [
-                    {[accounts[0]]: new BigNumber('17070428571428571428571').valueOf()},
+                    {[accounts[0]]: new BigNumber('23898600000000000000000').valueOf()},
                     {[accounts[1]]: new BigNumber('0').valueOf()},
                 ],
             }
@@ -328,19 +330,19 @@ contract('ICO', function (accounts) {
         await ico.sendTransaction({value:  new BigNumber('1').mul(precision).valueOf(), from: accounts[1]})
             .then(Utils.receiptShouldSucceed);
 
-        await ico.mint(accounts[1], new BigNumber('17070428571428571428571').valueOf(), {from: accounts[8]})
+        await ico.mint(accounts[1], new BigNumber('23898600000000000000000').valueOf(), {from: accounts[8]})
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
 
-        await ico.mint(accounts[1], new BigNumber('17070428571428571428571').valueOf())
+        await ico.mint(accounts[1], new BigNumber('23898600000000000000000').valueOf())
             .then(Utils.receiptShouldSucceed);
 
         await Utils.checkState({ico, howdoo}, {
             howdoo: {
                 balanceOf: [
-                    {[accounts[0]]: new BigNumber('17070428571428571428571').valueOf()},
-                    {[accounts[1]]: new BigNumber('34140857142857142857142').valueOf()},
-                    {[hisAddress]: new BigNumber('167777777.6').mul(precision).valueOf()},
+                    {[accounts[0]]: new BigNumber('23898600000000000000000').valueOf()},
+                    {[accounts[1]]: new BigNumber('47797200000000000000000').valueOf()},
+                    {[hisAddress]: new BigNumber('191111110.92').mul(precision).valueOf()},
                 ],
             },
             ico: {
@@ -349,7 +351,7 @@ contract('ICO', function (accounts) {
                 startTime: icoSince,
                 endTime: icoTill,
                 maxTokenSupply: new BigNumber('311111110.8').mul(precision).valueOf(),
-                soldTokens: new BigNumber('51211285714285714285713').valueOf(),
+                soldTokens: new BigNumber('71695800000000000000000').valueOf(),
                 collectedEthers: new BigNumber('2').mul(precision).valueOf(),
                 etherPriceInUSD: new BigNumber('119493000').valueOf(),
                 etherHolder: etherHolder,
@@ -369,27 +371,27 @@ contract('ICO', function (accounts) {
         await ico.airdrop()
             .then(Utils.receiptShouldSucceed);
 
-        await ico.mint(accounts[1], new BigNumber('17070428571428571428571').valueOf())
+        await ico.mint(accounts[1], new BigNumber('23898600000000000000000').valueOf())
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
 
-        //311111110.8 * 10 ^ 18 - 51211285714285714285713 = 311059899514285714285714287
-        //hisAccount 167777777.6 * 10 ^18 + 311059899514285714285714287 / 2     = 323307727357142857142857143.5
-        //accounts[0] 17070428571428571428571 + 311059899514285714285714287 / 4 = 77782045307142857142857142.75
-        //accounts[1] 34140857142857142857142 + 311059899514285714285714287 / 4 = 77799115735714285714285713.75
+        //311111110.8 * 10 ^ 18 - 71695800000000000000000 = 311039415000000000000000000
+        //hisAccount 191111110.92 * 10 ^ 18 + 311039415000000000000000000 / 2   = 346630818420000000000000000
+        //accounts[0] 23898600000000000000000 + 311039415000000000000000000 / 4 = 77783752350000000000000000
+        //accounts[1] 47797200000000000000000 + 311039415000000000000000000 / 4 = 77807650950000000000000000
         await Utils.checkState({ico, howdoo}, {
             howdoo: {
                 balanceOf: [
-                    {[accounts[0]]: new BigNumber('77782045307142857142857142').valueOf()},
-                    {[accounts[1]]: new BigNumber('77799115735714285714285713').valueOf()},
-                    {[hisAddress]: new BigNumber('323307727357142857142857145').valueOf()},
+                    {[accounts[0]]: new BigNumber('77783752350000000000000000').valueOf()},
+                    {[accounts[1]]: new BigNumber('77807650950000000000000000').valueOf()},
+                    {[hisAddress]: new BigNumber('346630818420000000000000000').valueOf()},
                 ],
             },
             ico: {
                 minInvest: new BigNumber('25000000').valueOf(),
                 howdoo: howdoo.address,
-                maxTokenSupply: new BigNumber('51211285714285714285713').valueOf(),
-                soldTokens: new BigNumber('51211285714285714285713').valueOf(),
+                maxTokenSupply: new BigNumber('71695800000000000000000').valueOf(),
+                soldTokens: new BigNumber('71695800000000000000000').valueOf(),
                 collectedEthers: new BigNumber('2').mul(precision).valueOf(),
                 etherPriceInUSD: new BigNumber('119493000').valueOf(),
                 etherHolder: etherHolder,
@@ -400,6 +402,113 @@ contract('ICO', function (accounts) {
             }
         });
 
+    });
+
+    it('check whitelisting', async function() {
+        const {howdoo, ico} = await deploy();
+        await ico.updateWhitelist(web3.eth.accounts[0], false);
+        await ico.updateWhitelist(web3.eth.accounts[1], false);
+        let other = accounts[5];
+        await Utils.checkState({ico, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[0]]: new BigNumber('0').valueOf()},
+                    {[accounts[1]]: new BigNumber('0').valueOf()},
+                ],
+            },
+            ico: {
+                minInvest: new BigNumber('25000000').valueOf(),
+                howdoo: howdoo.address,
+                startTime: icoSince,
+                endTime: icoTill,
+                maxTokenSupply: new BigNumber('311111110.8').mul(precision).valueOf(),
+                soldTokens: new BigNumber('0').valueOf(),
+                collectedEthers: new BigNumber('0').valueOf(),
+                etherPriceInUSD: new BigNumber('119493000').valueOf(),
+                etherHolder: etherHolder,
+                allowedMultivests: [
+                    {[multivestAddress]: true},
+                    {[bountyAddress]: false},
+                ],
+                whitelist: [
+                    {[accounts[0]]: false},
+                    {[accounts[1]]: false},
+                ],
+            }
+        });
+
+        await ico.updateWhitelist(other, true);
+        assert.equal(await ico.whitelist.call(other).valueOf(), true, 'whitelist isn\'t equal');
+
+        other = accounts[1];
+        await ico.updateWhitelist(other, true,{from:other})
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed)
+        assert.equal(await ico.whitelist.call(other).valueOf(),false, 'whitelist isn\'t equal');
+        await ico.updateWhitelist(other, true);
+        assert.isTrue(await ico.whitelist.call(other).valueOf() == true);
+        await ico.updateWhitelist(other, false, {from:other})
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed)
+        assert.isTrue(await ico.whitelist.call(other).valueOf() == true);
+        await ico.updateWhitelist(other, false)
+        assert.isTrue(await ico.whitelist.call(other).valueOf() == false);
+    });
+
+    it('check transaction through whitelisting', async function() {
+        const {howdoo, ico} = await deploy();
+        await ico.updateWhitelist(web3.eth.accounts[0], false);
+        await ico.updateWhitelist(web3.eth.accounts[1], false);
+
+        await Utils.checkState({ico, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[0]]: new BigNumber('0').valueOf()},
+                    {[accounts[1]]: new BigNumber('0').valueOf()},
+                ],
+            },
+            ico: {
+                minInvest: new BigNumber('25000000').valueOf(),
+                howdoo: howdoo.address,
+                startTime: icoSince,
+                endTime: icoTill,
+                maxTokenSupply: new BigNumber('311111110.8').mul(precision).valueOf(),
+                soldTokens: new BigNumber('0').valueOf(),
+                collectedEthers: new BigNumber('0').valueOf(),
+                etherPriceInUSD: new BigNumber('119493000').valueOf(),
+                etherHolder: etherHolder,
+                allowedMultivests: [
+                    {[multivestAddress]: true},
+                    {[bountyAddress]: false},
+                ],
+                whitelist: [
+                    {[accounts[0]]: false},
+                    {[accounts[1]]: false},
+                ],
+            }
+        });
+
+        await ico.sendTransaction({value: new BigNumber('1').mul(precision)})
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+
+        await ico.updateWhitelist(accounts[0], true);
+        await ico.updateWhitelist(accounts[1], true);
+
+        //10 ^ 18 * 119493000 / 10000 * 125/100 = 17923950000000000000000
+        await ico.sendTransaction({value: new BigNumber('1').mul(precision)})
+            .then(Utils.receiptShouldSucceed);
+        await ico.sendTransaction({value: new BigNumber('2').mul(precision), from: accounts[1]})
+            .then(Utils.receiptShouldSucceed);
+
+        await Utils.checkState({ico, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[0]]: new BigNumber('23898600000000000000000').valueOf()},
+                    {[accounts[1]]: new BigNumber('47797200000000000000000').valueOf()},
+                ],
+            }
+        });
     });
 
 });

@@ -1,5 +1,4 @@
-pragma solidity 0.4.18;
-
+pragma solidity 0.4.19;
 
 import "./SellableToken.sol";
 
@@ -7,6 +6,10 @@ import "./SellableToken.sol";
 contract ICO is SellableToken {
 
     uint256 public minInvest;
+
+    mapping (address => bool) public whitelist;
+
+    event WhitelistSet(address indexed contributorAddress, bool isWhitelisted);
 
     function ICO(
         address _multivestAddress,
@@ -28,21 +31,24 @@ contract ICO is SellableToken {
     ) {
         minInvest = _minInvest;
 
-        tiers.push(Tier(uint256(444444444).mul(uint256(10) ** DECIMALS.sub(1)), uint256(7000)));//@ 0,07 USD
-        tiers.push(Tier(uint256(888888888).mul(uint256(10) ** DECIMALS.sub(1)), uint256(9000)));//@ 0,09 USD
-        tiers.push(Tier(uint256(1777777776).mul(uint256(10) ** DECIMALS.sub(1)), uint256(1200)));//@ 0,12 USD
-        tiers.push(Tier(uint256(222222222).mul(uint256(10) ** DECIMALS), uint256(1500)));//@ 0,15 USD
-        tiers.push(Tier(uint256(2666666664).mul(uint256(10) ** DECIMALS.sub(1)), uint256(1600)));//@ 0,16 USD
-        tiers.push(Tier(uint256(3111111108).mul(uint256(10) ** DECIMALS.sub(1)), uint256(1700)));//@ 0,17 USD
+        tiers.push(Tier(uint256(444444444).mul(uint256(10) ** DECIMALS.sub(1)), uint256(5000)));//@ 0,05 USD
+        tiers.push(Tier(uint256(1777777776).mul(uint256(10) ** DECIMALS.sub(1)), uint256(8000)));//@ 0,08 USD
+        tiers.push(Tier(uint256(2666666664).mul(uint256(10) ** DECIMALS.sub(1)), uint256(9000)));//@ 0,09 USD
+        tiers.push(Tier(uint256(3111111108).mul(uint256(10) ** DECIMALS.sub(1)), uint256(1000)));//@ 0,10 USD
     }
 
     /* public methods */
     function() public payable {
-        require(buy(msg.sender, msg.value) == true);
+        require(true == whitelist[msg.sender] && buy(msg.sender, msg.value) == true);
     }
 
     function changeMinInvest(uint256 _minInvest) public onlyOwner {
         minInvest = _minInvest;
+    }
+
+    function updateWhitelist(address _address, bool isWhitelisted) public onlyOwner {
+        whitelist[_address] = isWhitelisted;
+        WhitelistSet(_address, isWhitelisted);
     }
 
     function calculateTokensAmount(uint256 _value) public view returns (uint256) {
@@ -83,10 +89,13 @@ contract ICO is SellableToken {
         if (_value == 0) {
             return false;
         }
-        require(withinPeriod());
-        require(_address != address(0));
+        require(_address != address(0) && withinPeriod());
 
-        updatePrice();
+        if (priceUpdateAt.add(1 hours) < block.timestamp) {
+            update();
+            priceUpdateAt = block.timestamp;
+        }
+
         uint256 amount = calculateTokensAmount(_value);
 
         require(amount > 0);
@@ -97,13 +106,6 @@ contract ICO is SellableToken {
 
         transferEthers();
         return true;
-    }
-
-    function updatePrice() internal {
-        if (priceUpdateAt.add(1 hours) < block.timestamp) {
-            update();
-            priceUpdateAt = block.timestamp;
-        }
     }
 
 }

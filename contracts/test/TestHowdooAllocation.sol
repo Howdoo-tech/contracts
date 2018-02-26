@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity 0.4.19;
 
 
 import "../HowdooAllocation.sol";
@@ -13,10 +13,6 @@ contract TestHowdooAllocation is HowdooAllocation {
         _howdoo,
         _ico
     ) {}
-
-    function testChangeRemainingTokens(uint256 _remainingTokens) public returns (uint256) {
-        remainingTokens = _remainingTokens;
-    }
 
     function testGetAllocationsLength() public view returns (uint256) {
         return allocations.length;

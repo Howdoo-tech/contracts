@@ -59,7 +59,7 @@ contract('Token', function (accounts) {
                 hisAddress: hisAddress,
                 allowedAddress: allowedAddress,
                 maxSupply: new BigNumber('888888888').mul(precision).valueOf(),
-                totalSupply: new BigNumber('311111110.8').mul(precision).valueOf(),
+                totalSupply: new BigNumber('378888888.52').mul(precision).valueOf(),
                 minters: [
                     {[accounts[0]]: true},
                     {[ico.address]: true},
@@ -74,8 +74,8 @@ contract('Token', function (accounts) {
                 balanceOf: [
                     {[accounts[0]]: new BigNumber('0').mul(precision).valueOf()},
                     {[allowedAddress]: new BigNumber('0').mul(precision).valueOf()},
-                    {[treasuryAddress]: new BigNumber('133333333.2').mul(precision).valueOf()},
-                    {[hisAddress]: new BigNumber('167777777.6').mul(precision).valueOf()},
+                    {[treasuryAddress]: new BigNumber('177777777.6').mul(precision).valueOf()},
+                    {[hisAddress]: new BigNumber('191111110.92').mul(precision).valueOf()},
                     {[bountyAddress]: new BigNumber('10000000').mul(precision).valueOf()},
                 ],
             }
@@ -118,7 +118,7 @@ contract('Token', function (accounts) {
                 hisAddress: hisAddress,
                 allowedAddress: allowedAddress,
                 maxSupply: new BigNumber('888888888').mul(precision).valueOf(),
-                totalSupply: new BigNumber('311111110.8').mul(precision).valueOf(),
+                totalSupply: new BigNumber('378888888.52').mul(precision).valueOf(),
                 minters: [
                     {[accounts[0]]: true},
                     {[ico.address]: true},
@@ -134,8 +134,8 @@ contract('Token', function (accounts) {
                 balanceOf: [
                     {[accounts[0]]: new BigNumber('0').mul(precision).valueOf()},
                     {[allowedAddress]: new BigNumber('0').mul(precision).valueOf()},
-                    {[treasuryAddress]: new BigNumber('133333333.2').mul(precision).valueOf()},
-                    {[hisAddress]: new BigNumber('167777777.6').mul(precision).valueOf()},
+                    {[treasuryAddress]: new BigNumber('177777777.6').mul(precision).valueOf()},
+                    {[hisAddress]: new BigNumber('191111110.92').mul(precision).valueOf()},
                     {[bountyAddress]: new BigNumber('10000000').mul(precision).valueOf()},
                 ],
             }
@@ -159,7 +159,7 @@ contract('Token', function (accounts) {
                 hisAddress: hisAddress,
                 allowedAddress: allowedAddress,
                 maxSupply: new BigNumber('888888888').mul(precision).valueOf(),
-                totalSupply: new BigNumber('311111110.8').mul(precision).add('1000').valueOf(),
+                totalSupply: new BigNumber('378888888.52').mul(precision).add('1000').valueOf(),
                 minters: [
                     {[accounts[0]]: true},
                     {[ico.address]: true},
@@ -175,8 +175,8 @@ contract('Token', function (accounts) {
                 balanceOf: [
                     {[accounts[0]]: new BigNumber('1000').valueOf()},
                     {[allowedAddress]: new BigNumber('0').mul(precision).valueOf()},
-                    {[treasuryAddress]: new BigNumber('133333333.2').mul(precision).valueOf()},
-                    {[hisAddress]: new BigNumber('167777777.6').mul(precision).valueOf()},
+                    {[treasuryAddress]: new BigNumber('177777777.6').mul(precision).valueOf()},
+                    {[hisAddress]: new BigNumber('191111110.92').mul(precision).valueOf()},
                     {[bountyAddress]: new BigNumber('10000000').mul(precision).valueOf()},
                 ],
             }
@@ -197,7 +197,7 @@ contract('Token', function (accounts) {
                 hisAddress: hisAddress,
                 allowedAddress: allowedAddress,
                 maxSupply: new BigNumber('888888888').mul(precision).valueOf(),
-                totalSupply: new BigNumber('311111110.8').mul(precision).add('1000').valueOf(),
+                totalSupply: new BigNumber('378888888.52').mul(precision).add('1000').valueOf(),
                 minters: [
                     {[accounts[0]]: true},
                     {[ico.address]: true},
@@ -214,8 +214,8 @@ contract('Token', function (accounts) {
                     {[accounts[0]]: new BigNumber('500').valueOf()},
                     {[accounts[1]]: new BigNumber('500').valueOf()},
                     {[allowedAddress]: new BigNumber('0').mul(precision).valueOf()},
-                    {[treasuryAddress]: new BigNumber('133333333.2').mul(precision).valueOf()},
-                    {[hisAddress]: new BigNumber('167777777.6').mul(precision).valueOf()},
+                    {[treasuryAddress]: new BigNumber('177777777.6').mul(precision).valueOf()},
+                    {[hisAddress]: new BigNumber('191111110.92').mul(precision).valueOf()},
                     {[bountyAddress]: new BigNumber('10000000').mul(precision).valueOf()},
                 ],
             }
@@ -232,7 +232,7 @@ contract('Token', function (accounts) {
                 hisAddress: hisAddress,
                 allowedAddress: allowedAddress,
                 maxSupply: new BigNumber('888888888').mul(precision).valueOf(),
-                totalSupply: new BigNumber('311111110.8').mul(precision).add('1000').valueOf(),
+                totalSupply: new BigNumber('378888888.52').mul(precision).add('1000').valueOf(),
                 minters: [
                     {[accounts[0]]: true},
                     {[ico.address]: true},
@@ -249,8 +249,8 @@ contract('Token', function (accounts) {
                     {[accounts[0]]: new BigNumber('0').valueOf()},
                     {[accounts[1]]: new BigNumber('1000').valueOf()},
                     {[allowedAddress]: new BigNumber('0').mul(precision).valueOf()},
-                    {[treasuryAddress]: new BigNumber('133333333.2').mul(precision).valueOf()},
-                    {[hisAddress]: new BigNumber('167777777.6').mul(precision).valueOf()},
+                    {[treasuryAddress]: new BigNumber('177777777.6').mul(precision).valueOf()},
+                    {[hisAddress]: new BigNumber('191111110.92').mul(precision).valueOf()},
                     {[bountyAddress]: new BigNumber('10000000').mul(precision).valueOf()},
                 ],
             }
@@ -273,7 +273,7 @@ contract('Token', function (accounts) {
                 hisAddress: hisAddress,
                 allowedAddress: allowedAddress,
                 maxSupply: new BigNumber('888888888').mul(precision).valueOf(),
-                totalSupply: new BigNumber('311111110.8').mul(precision).add(1500).valueOf(),
+                totalSupply: new BigNumber('378888888.52').mul(precision).add(1500).valueOf(),
                 minters: [
                     {[accounts[0]]: true},
                     {[ico.address]: true},
@@ -289,8 +289,8 @@ contract('Token', function (accounts) {
                     {[accounts[0]]: new BigNumber('1500').valueOf()},
                     {[accounts[1]]: new BigNumber('0').valueOf()},
                     {[allowedAddress]: new BigNumber('0').mul(precision).valueOf()},
-                    {[treasuryAddress]: new BigNumber('133333333.2').mul(precision).valueOf()},
-                    {[hisAddress]: new BigNumber('167777777.6').mul(precision).valueOf()},
+                    {[treasuryAddress]: new BigNumber('177777777.6').mul(precision).valueOf()},
+                    {[hisAddress]: new BigNumber('191111110.92').mul(precision).valueOf()},
                     {[bountyAddress]: new BigNumber('10000000').mul(precision).valueOf()},
                 ],
             }
@@ -341,7 +341,7 @@ contract('Token', function (accounts) {
                 hisAddress: hisAddress,
                 allowedAddress: allowedAddress,
                 maxSupply: new BigNumber('888888888').mul(precision).valueOf(),
-                totalSupply: new BigNumber('311111110.8').mul(precision).add(1500).valueOf(),
+                totalSupply: new BigNumber('378888888.52').mul(precision).add(1500).valueOf(),
                 minters: [
                     {[accounts[0]]: true},
                     {[ico.address]: true},
@@ -357,8 +357,8 @@ contract('Token', function (accounts) {
                     {[accounts[0]]: new BigNumber('500').valueOf()},
                     {[accounts[1]]: new BigNumber('1000').valueOf()},
                     {[allowedAddress]: new BigNumber('500').valueOf()},
-                    {[treasuryAddress]: new BigNumber('133333333.2').mul(precision).valueOf()},
-                    {[hisAddress]: new BigNumber('167777777.6').mul(precision).valueOf()},
+                    {[treasuryAddress]: new BigNumber('177777777.6').mul(precision).valueOf()},
+                    {[hisAddress]: new BigNumber('191111110.92').mul(precision).valueOf()},
                     {[bountyAddress]: new BigNumber('10000000').mul(precision).sub(500).valueOf()},
                 ],
             }

@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity 0.4.19;
 
 
 import "./Ownable.sol";
@@ -7,6 +7,7 @@ import "./OraclizeAPI.sol";
 
 
 contract Multivest is Ownable, usingOraclize {
+
     using SafeMath for uint256;
 
     uint256 public etherPriceInUSD; //$753.25  75325000
@@ -45,7 +46,6 @@ contract Multivest is Ownable, usingOraclize {
         require(status == true);
     }
 
-    function updatePrice() internal;
     function buy(address _address, uint256 value) internal returns (bool);
 
 }
