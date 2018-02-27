@@ -51,6 +51,28 @@ contract ICO is SellableToken {
         WhitelistSet(_address, isWhitelisted);
     }
 
+    function airdrop(uint256 _toInvestorsAmount) public onlyOwner {
+        if (!isActive() && now >= startTime && _toInvestorsAmount > 0) {
+            if (maxTokenSupply > soldTokens) {
+                airdropAmount = maxTokenSupply.sub(soldTokens).div(2);
+                maxTokenSupply = soldTokens;
+                require(airdropAmount == howdoo.mint(howdoo.hisAddress(), airdropAmount));
+            }
+
+            if (investors.length > airdropPointer) {
+                _toInvestorsAmount = airdropPointer.add(_toInvestorsAmount);
+                if (_toInvestorsAmount > investors.length) {
+                    _toInvestorsAmount = investors.length;
+                }
+                uint256 investorTokens = airdropAmount.div(investors.length);
+                for (uint256 i = airdropPointer; i < _toInvestorsAmount; i++) {
+                    require(investorTokens == howdoo.mint(investors[i], investorTokens));
+                }
+                airdropPointer = i;
+            }
+        }
+    }
+
     function calculateTokensAmount(uint256 _value) public view returns (uint256) {
         if (_value == 0 || _value < ((uint256(10) ** DECIMALS).mul(minInvest).div(etherPriceInUSD))) {
             return 0;
@@ -85,6 +107,38 @@ contract ICO is SellableToken {
         return newSoldTokens.sub(soldTokens);
     }
 
+    function calculateEthersAmount(uint256 _amount) public view returns (uint256) {
+        if (_amount == 0) {
+            return 0;
+        }
+
+        uint256 ethersAmount;
+        uint256 remainingValue = _amount;
+
+        for (uint i = 0; i < tiers.length; i++) {
+            if (tiers[i].maxAmount > soldTokens) {
+                if (soldTokens.add(_amount) > tiers[i].maxAmount) {
+                    uint256 diff = tiers[i].maxAmount.sub(soldTokens);
+                    remainingValue = remainingValue.sub(diff);
+                    ethersAmount = ethersAmount.add(diff.mul(tiers[i].price).div(etherPriceInUSD));
+                } else {
+                    ethersAmount = ethersAmount.add(remainingValue.mul(tiers[i].price).div(etherPriceInUSD));
+                    remainingValue = 0;
+                }
+
+                if (remainingValue == 0) {
+                    break;
+                }
+            }
+        }
+
+        if (remainingValue > 0 || ethersAmount < ((uint256(10) ** DECIMALS).mul(minInvest).div(etherPriceInUSD))) {
+            return 0;
+        }
+
+        return ethersAmount;
+    }
+
     function buy(address _address, uint256 _value) internal returns (bool) {
         if (_value == 0) {
             return false;
@@ -98,8 +152,7 @@ contract ICO is SellableToken {
 
         uint256 amount = calculateTokensAmount(_value);
 
-        require(amount > 0);
-        require(amount == mintInternal(_address, amount));
+        require(amount > 0 && amount == mintInternal(_address, amount));
 
         collectedEthers = collectedEthers.add(_value);
         Contribution(_address, _value, amount);

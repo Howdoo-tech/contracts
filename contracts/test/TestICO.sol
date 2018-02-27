@@ -41,4 +41,10 @@ contract TestICO is ICO {
         return calculateTokensAmount(_value);
     }
 
+    function testCalculateEthersAmount(uint256 _value, uint256 _soldTokens) public returns (uint256) {
+        soldTokens = _soldTokens;
+
+        return calculateEthersAmount(_value);
+    }
+
 }
