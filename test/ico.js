@@ -855,4 +855,29 @@ contract('ICO', function (accounts) {
 
     });
 
+    it("check getStats", async function () {
+        const {howdoo, ico} = await deploy();
+
+        let stats = await ico.getStats();
+        assert.equal(await stats[0], new BigNumber(icoSince).valueOf(), "startTime is not equal");
+        assert.equal(await stats[1], new BigNumber(icoTill).valueOf(), "endTime is not equal");
+        assert.equal(await stats[2], new BigNumber('0').mul(precision).valueOf(), "soldTokens is not equal");
+        assert.equal(await stats[3], new BigNumber('311111110.8').mul(precision).valueOf(), "maxTokenSupply is not equal");
+        assert.equal(await stats[4], new BigNumber('23898600000000000000000').valueOf(), "tokensPerEth is not equal");
+        assert.equal(await stats[5], new BigNumber(5000).valueOf(), "tierPrice is not equal");
+        assert.equal(await stats[6], new BigNumber('44444444.4').mul(precision).valueOf(), "tierMaxAmount is not equal");
+
+        await ico.testChangeSoldTokens(new BigNumber('44444444.5').mul(precision).valueOf());
+        await ico.testChangeICOPeriod(28, 82);
+
+        stats = await ico.getStats();
+        assert.equal(await stats[0], new BigNumber(28).valueOf(), "startTime is not equal");
+        assert.equal(await stats[1], new BigNumber(82).valueOf(), "endTime is not equal");
+        assert.equal(await stats[2], new BigNumber('44444444.5').mul(precision).valueOf(), "soldTokens is not equal");
+        assert.equal(await stats[3], new BigNumber('311111110.8').mul(precision).valueOf(), "maxTokenSupply is not equal");
+        assert.equal(await stats[4], new BigNumber('14936625000000000000000').valueOf(), "tokensPerEth is not equal");
+        assert.equal(await stats[5], new BigNumber(8000).valueOf(), "tierPrice is not equal");
+        assert.equal(await stats[6], new BigNumber('177777777.6').mul(precision).valueOf(), "tierMaxAmount is not equal");
+    });
+
 });

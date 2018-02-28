@@ -732,6 +732,62 @@
       "payable": false,
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getStats",
+      "outputs": [
+        {
+          "name": "start",
+          "type": "uint256"
+        },
+        {
+          "name": "end",
+          "type": "uint256"
+        },
+        {
+          "name": "sold",
+          "type": "uint256"
+        },
+        {
+          "name": "maxSupply",
+          "type": "uint256"
+        },
+        {
+          "name": "tokensPerEth",
+          "type": "uint256"
+        },
+        {
+          "name": "tierPrice",
+          "type": "uint256"
+        },
+        {
+          "name": "tierMaxAmount",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getCurrentTier",
+      "outputs": [
+        {
+          "name": "tierPrice",
+          "type": "uint256"
+        },
+        {
+          "name": "tierMaxAmount",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
     }
   ]
 }
