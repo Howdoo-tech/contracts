@@ -119,16 +119,16 @@ contract SellableToken is Multivest, usingOraclize {
     }
 
     function __callback(bytes32, string _result, bytes) public {
-//        require(msg.sender == oraclize_cbAddress());
-//        uint256 result = parseInt(_result, 5);
-//        uint256 newPrice = uint256(10 ** 23).div(result);
-//        require(newPrice > 0);
-//        //not update when increasing/decreasing in 3 times
-//        if (result.div(3) < etherPriceInUSD || result.mul(3) > etherPriceInUSD) {
-//            etherPriceInUSD = result;
-//
-//            NewHowdooPriceTicker(_result);
-//        }
+        require(msg.sender == oraclize_cbAddress());
+        uint256 result = parseInt(_result, 5);
+        uint256 newPrice = uint256(10 ** 23).div(result);
+        require(newPrice > 0);
+        //not update when increasing/decreasing in 3 times
+        if (result.div(3) < etherPriceInUSD || result.mul(3) > etherPriceInUSD) {
+            etherPriceInUSD = result;
+
+            NewHowdooPriceTicker(_result);
+        }
     }
 
     function transferEthers() internal {
@@ -136,12 +136,12 @@ contract SellableToken is Multivest, usingOraclize {
     }
 
     function update() internal {
-//        if (oraclize_getPrice("URL") > this.balance) {
-//            NewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
-//        } else {
-//            NewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
-//            oraclize_query("URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
-//        }
+        if (oraclize_getPrice("URL") > this.balance) {
+            NewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+        } else {
+            NewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
+            oraclize_query("URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
+        }
     }
 
     function mintInternal(address _address, uint256 _tokenAmount) internal returns (uint256) {

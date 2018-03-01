@@ -139,32 +139,65 @@ contract ICO is SellableToken {
         return ethersAmount;
     }
 
+//    function getStats() internal view returns (
+//        uint256 start,
+//        uint256 end,
+//        uint256 sold,
+//        uint256 maxSupply,
+//        uint256 tokensPerEth,
+//        uint256[] storage tiersPrices,
+//        uint256[] storage tiersMaxAmounts
+//    ) {
+//        start = startTime;
+//        end = endTime;
+//        sold = soldTokens;
+//        maxSupply = maxTokenSupply;
+//        tokensPerEth = calculateTokensAmount(1 ether);
+//        (tierPrice, tierMaxAmount) = getCurrentTier();
+//        uint256[] storage tiersPricesArray;
+//        uint256[] storage tiersMaxAmountsArray;
+//        for (uint i = 0; i < tiers.length; i++) {
+//            tiersPricesArray.push(tiers[i].price);
+//            tiersMaxAmountsArray.push(tiers[i].maxAmount);
+//        }
+//        tiersPrices = tiersPricesArray;
+//    }
     function getStats() public view returns (
-        uint256 start,
-        uint256 end,
-        uint256 sold,
-        uint256 maxSupply,
-        uint256 tokensPerEth,
-        uint256 tierPrice,
-        uint256 tierMaxAmount
-    ) {
-        start = startTime;
-        end = endTime;
-        sold = soldTokens;
-        maxSupply = maxTokenSupply;
-        tokensPerEth = calculateTokensAmount(1 ether);
-        (tierPrice, tierMaxAmount) = getCurrentTier();
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256[],
+        uint256[]
+    ){
+        uint256[] storage tiersPricesArray;
+        uint256[] storage tiersMaxAmountsArray;
+        for (uint i = 0; i < tiers.length; i++) {
+            tiersPricesArray.push(tiers[i].price);
+            tiersMaxAmountsArray.push(tiers[i].maxAmount);
+        }
+
+        return (
+            startTime,
+            endTime,
+            soldTokens,
+            maxTokenSupply,
+            calculateTokensAmount(1 ether),
+            tiersPricesArray,
+            tiersMaxAmountsArray
+        );
     }
 
-    function getCurrentTier() public view returns (uint256 tierPrice, uint256 tierMaxAmount){
-        for (uint i = 0; i < tiers.length; i++) {
-            if (tiers[i].maxAmount > soldTokens) {
-                tierPrice = tiers[i].price;
-                tierMaxAmount = tiers[i].maxAmount;
-                break;
-            }
-        }
-    }
+//    function getCurrentTier() public view returns (uint256 tierPrice, uint256 tierMaxAmount){
+//        for (uint i = 0; i < tiers.length; i++) {
+//            if (tiers[i].maxAmount > soldTokens) {
+//                tierPrice = tiers[i].price;
+//                tierMaxAmount = tiers[i].maxAmount;
+//                break;
+//            }
+//        }
+//    }
 
     function buy(address _address, uint256 _value) internal returns (bool) {
         if (_value == 0) {

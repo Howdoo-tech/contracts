@@ -62,7 +62,7 @@ async function deploy() {
 }
 
 contract('ICO', function (accounts) {
-
+/*
     it("deploy & check constructor info & changeMinInvest & setHowdoo & setEtherHolder", async function () {
         const {howdoo, ico} = await deploy();
 
@@ -854,11 +854,12 @@ contract('ICO', function (accounts) {
         });
 
     });
-
+*/
     it("check getStats", async function () {
         const {howdoo, ico} = await deploy();
 
         let stats = await ico.getStats();
+        console.log(stats);
         assert.equal(await stats[0], new BigNumber(icoSince).valueOf(), "startTime is not equal");
         assert.equal(await stats[1], new BigNumber(icoTill).valueOf(), "endTime is not equal");
         assert.equal(await stats[2], new BigNumber('0').mul(precision).valueOf(), "soldTokens is not equal");
