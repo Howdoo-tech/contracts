@@ -48,18 +48,15 @@ contract Howdoo is MintingERC20 {
     }
 
     function freezing(bool _transferFrozen) public onlyOwner {
-        if (address(ico) != address(0) && !ico.isActive()) {
-            //prevent run before ICO
-            if (block.timestamp >= ico.startTime()) {
-                transferFrozen = _transferFrozen;
-            }
+        if (address(ico) != address(0) && ico.isICOFinished()) {
+            transferFrozen = _transferFrozen;
         }
     }
 
     function mint(address _addr, uint256 _amount) public onlyMinters returns (uint256) {
         if (msg.sender == owner) {
             require(address(ico) != address(0));
-            if (!ico.isActive() || _addr == allowedAddress) {
+            if (ico.isICOFinished() || _addr == allowedAddress) {
                 return super.mint(_addr, _amount);
             }
             return uint256(0);

@@ -35,8 +35,6 @@ async function deploy() {
         multivestAddress,
         howdoo.address,
         etherHolder,
-        icoSince,// _startTime,
-        icoTill, //_endTime,
         new BigNumber('119493000').valueOf(),//1,194.930008
         new BigNumber('25000000').valueOf(),//25000000
         new BigNumber('311111110.8').mul(precision).valueOf(),//_maxTokenSupply

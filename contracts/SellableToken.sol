@@ -10,6 +10,8 @@ contract SellableToken is Multivest, usingOraclize {
 
     uint256 public constant DECIMALS = 18;
 
+    uint256 public constant PRE_ICO_ID = 0;
+
     Howdoo public howdoo;
 
     uint256 public startTime;
@@ -37,6 +39,8 @@ contract SellableToken is Multivest, usingOraclize {
     struct Tier {
         uint256 maxAmount;
         uint256 price;
+        uint256 startTime;
+        uint256 endTime;
     }
 
     event NewOraclizeQuery(string _description);
@@ -46,8 +50,6 @@ contract SellableToken is Multivest, usingOraclize {
         address _multivestAddress,
         address _howdoo,
         address _etherHolder,
-        uint256 _startTime,
-        uint256 _endTime,
         uint256 _etherPriceInUSD,
         uint256 _maxTokenSupply
     ) public Multivest(_multivestAddress)
@@ -55,12 +57,9 @@ contract SellableToken is Multivest, usingOraclize {
         require(_howdoo != address(0));
         howdoo = Howdoo(_howdoo);
 
-        require(_startTime < _endTime);
         etherHolder = _etherHolder;
         require((_maxTokenSupply == uint256(0)) || (_maxTokenSupply <= howdoo.maxSupply()));
 
-        startTime = _startTime;
-        endTime = _endTime;
         etherPriceInUSD = _etherPriceInUSD;
         maxTokenSupply = _maxTokenSupply;
 
@@ -71,17 +70,6 @@ contract SellableToken is Multivest, usingOraclize {
     function setHowdoo(address _howdoo) public onlyOwner {
         require(_howdoo != address(0));
         howdoo = Howdoo(_howdoo);
-    }
-
-    function isActive() public view returns (bool) {
-        if (maxTokenSupply > uint256(0) && soldTokens == maxTokenSupply) {
-            return false;
-        }
-        return withinPeriod();
-    }
-
-    function withinPeriod() public view returns (bool) {
-        return block.timestamp >= startTime && block.timestamp <= endTime;
     }
 
     // set ether price in USD with 5 digits after the decimal point
@@ -110,8 +98,40 @@ contract SellableToken is Multivest, usingOraclize {
         etherHolder = _etherHolder;
     }
 
+    function isPreICOActive() public returns (bool) {
+        if (tiers[PRE_ICO_ID].endTime <= now) {
+            if (soldTokens < tiers[PRE_ICO_ID].maxAmount) {
+                Tier storage preICOTier = tiers[PRE_ICO_ID];
+
+                for (uint i = PRE_ICO_ID.add(1); i < tiers.length; i++) {
+                    Tier storage icoTier = tiers[i];
+                    icoTier.maxAmount = icoTier.maxAmount.add(preICOTier.maxAmount.sub(soldTokens));
+                }
+
+                preICOTier.maxAmount = soldTokens;
+            }
+
+            return false;
+        }
+
+        return tiers[PRE_ICO_ID].startTime <= now && soldTokens < tiers[PRE_ICO_ID].maxAmount;
+    }
+
+    function isICOFinished() public returns (bool) {
+        if (maxTokenSupply > uint256(0) && soldTokens == maxTokenSupply) {
+            return true;
+        }
+
+        if (tiers[tiers.length.sub(1)].endTime <= now) {
+            airdropInternal(investors.length);
+            return true;
+        }
+
+        return false;
+    }
+
     function mint(address _address, uint256 _tokenAmount) public onlyOwner returns (uint256) {
-        if (isActive() && now > startTime) {
+        if (!isICOFinished()) {
             return mintInternal(_address, _tokenAmount);
         }
 
@@ -158,6 +178,28 @@ contract SellableToken is Multivest, usingOraclize {
         }
 
         return _tokenAmount;
+    }
+
+    function airdropInternal(uint256 _toInvestorsAmount) internal {
+        if (_toInvestorsAmount > 0) {
+            if (maxTokenSupply > soldTokens) {
+                airdropAmount = maxTokenSupply.sub(soldTokens).div(2);
+                maxTokenSupply = soldTokens;
+                require(airdropAmount == howdoo.mint(howdoo.hisAddress(), airdropAmount));
+            }
+
+            if (investors.length > airdropPointer) {
+                _toInvestorsAmount = airdropPointer.add(_toInvestorsAmount);
+                if (_toInvestorsAmount > investors.length) {
+                    _toInvestorsAmount = investors.length;
+                }
+                uint256 investorTokens = airdropAmount.div(investors.length);
+                for (uint256 i = airdropPointer; i < _toInvestorsAmount; i++) {
+                    require(investorTokens == howdoo.mint(investors[i], investorTokens));
+                }
+                airdropPointer = i;
+            }
+        }
     }
 
 }

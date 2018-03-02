@@ -13,6 +13,9 @@ var BigNumber = require('bignumber.js');
 */
 
 contract('ERC20', function(accounts) {
+    beforeEach(async function () {
+
+    });
     it("deploy & check for total supply & balance of smart contract & sender", function() {
         var instance;
 

@@ -33,8 +33,6 @@ async function deploy() {
         multivestAddress,
         howdoo.address,
         etherHolder,
-        icoSince,// _startTime,
-        icoTill, //_endTime,
         new BigNumber('119493000').valueOf(),//1,194.930008
         new BigNumber('25000000').valueOf(),//25000000
         new BigNumber('311111110.8').mul(precision).valueOf(),//_maxTokenSupply
@@ -47,7 +45,9 @@ async function deploy() {
 }
 
 contract('Token', function (accounts) {
-
+    // beforeEach(async function () {
+    //
+    // });
     it("deploy & check constructor info && initialAllocation & setICO & setLocked & transfer & approve & transferFrom & transferAllowed", async function () {
         const {howdoo, ico} = await deploy();
 
@@ -318,8 +318,11 @@ contract('Token', function (accounts) {
         await howdoo.transfer(allowedAddress, 500, {from: bountyAddress})
             .then(Utils.receiptShouldSucceed);
 
-        await ico.testChangeICOPeriod(parseInt(new Date().getTime() / 1000 - 7200), parseInt(new Date().getTime() / 1000 - 3600));
-        assert.equal(await ico.isActive.call().valueOf(), false, "ico.isActive().valueOf() not equal");
+        await ico.changePreICODates(parseInt(new Date().getTime() / 1000 - 7200 * 2), parseInt(new Date().getTime() / 1000 - 3600 * 2));
+        await ico.changeICODates(parseInt(new Date().getTime() / 1000 - 7200), parseInt(new Date().getTime() / 1000 - 3600));
+
+        assert.equal(await ico.isICOFinished.call().valueOf(), true, "ico.isActive().valueOf() not equal");
+
         await howdoo.freezing(false);
         assert.equal(await howdoo.transferFrozen.call(), false, 'transferFrozen is not equal');
 
