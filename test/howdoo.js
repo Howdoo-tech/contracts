@@ -45,7 +45,7 @@ async function deploy() {
 }
 
 contract('Token', function (accounts) {
-    // beforeEach(async function () {
+    // beforeEach(async function (done) {
     //
     // });
     it("deploy & check constructor info && initialAllocation & setICO & setLocked & transfer & approve & transferFrom & transferAllowed", async function () {

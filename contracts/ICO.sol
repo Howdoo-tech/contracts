@@ -1,9 +1,12 @@
 pragma solidity 0.4.19;
 
 import "./SellableToken.sol";
+import "./PrivateSale.sol";
 
 
 contract ICO is SellableToken {
+
+    PrivateSale public privateSale;
 
     uint256 public minInvest;
 
@@ -42,7 +45,7 @@ contract ICO is SellableToken {
         tiers.push(
             Tier(
                 uint256(2666666664).mul(uint256(10) ** DECIMALS.sub(1)),
-                uint256(1000),
+                uint256(10000),
                 0,
                 1527335940
             )
@@ -53,8 +56,10 @@ contract ICO is SellableToken {
     }
 
     /* public methods */
-    function() public payable {
-        require(buy(msg.sender, msg.value) == true);
+    function setPrivateSale(address _privateSale) public onlyOwner {
+        if (_privateSale != address(0)) {
+            privateSale = PrivateSale(_privateSale);
+        }
     }
 
     function changeMinInvest(uint256 _minInvest) public onlyOwner {
@@ -87,7 +92,7 @@ contract ICO is SellableToken {
     }
 
     function calculateTokensAmount(uint256 _value) public returns (uint256) {
-        if (_value == 0 || _value < ((uint256(10) ** DECIMALS).mul(minInvest).div(etherPriceInUSD))) {
+        if (_value == 0 || _value < (uint256(1 ether).mul(minInvest).div(etherPriceInUSD))) {
             return 0;
         }
 
@@ -97,29 +102,26 @@ contract ICO is SellableToken {
             return soldTokens.add(amount) <= tiers[PRE_ICO_ID].maxAmount ? amount : 0;
         }
 
+        if (tiers[PRE_ICO_ID.add(1)].startTime > now || isICOFinished()) {
+            return 0;
+        }
         uint256 newSoldTokens = soldTokens;
         uint256 remainingValue = _value;
 
-        for (uint i = 0; i < tiers.length; i++) {
-            if (
-                tiers[i].startTime != 0 && tiers[i].startTime >= now &&
-                tiers[i].endTime != 0 && tiers[i].endTime <= now &&
-                tiers[i].maxAmount > soldTokens
-            ) {
-                amount = remainingValue.mul(etherPriceInUSD).div(tiers[i].price);
+        for (uint i = PRE_ICO_ID.add(1); i < tiers.length; i++) {
+            amount = remainingValue.mul(etherPriceInUSD).div(tiers[i].price);
 
-                if (newSoldTokens.add(amount) > tiers[i].maxAmount) {
-                    uint256 diff = tiers[i].maxAmount.sub(newSoldTokens);
-                    remainingValue = remainingValue.sub(diff.mul(tiers[i].price).div(etherPriceInUSD));
-                    newSoldTokens = newSoldTokens.add(diff);
-                } else {
-                    remainingValue = 0;
-                    newSoldTokens = newSoldTokens.add(amount);
-                }
+            if (newSoldTokens.add(amount) > tiers[i].maxAmount) {
+                uint256 diff = tiers[i].maxAmount.sub(newSoldTokens);
+                remainingValue = remainingValue.sub(diff.mul(tiers[i].price).div(etherPriceInUSD));
+                newSoldTokens = newSoldTokens.add(diff);
+            } else {
+                remainingValue = 0;
+                newSoldTokens = newSoldTokens.add(amount);
+            }
 
-                if (remainingValue == 0) {
-                    break;
-                }
+            if (remainingValue == 0) {
+                break;
             }
         }
 
@@ -130,48 +132,69 @@ contract ICO is SellableToken {
         return newSoldTokens.sub(soldTokens);
     }
 
-    function calculateEthersAmount(uint256 _amount) public returns (uint256) {
+    function calculateEthersAmount(uint256 _amount) public constant returns (uint256) {
         if (_amount == 0) {
             return 0;
         }
-
         uint256 ethersAmount;
         if (isPreICOActive()) {
             ethersAmount = _amount.mul(tiers[i].price).div(etherPriceInUSD);
-            return soldTokens.add(_amount) <= tiers[PRE_ICO_ID].maxAmount ? ethersAmount : 0;
+            if (
+                ethersAmount < (uint256(1 ether).mul(minInvest).div(etherPriceInUSD)) ||
+                soldTokens.add(_amount) >= tiers[PRE_ICO_ID].maxAmount
+            ) {
+                return 0;
+            }
+            return ethersAmount;
         }
 
+        if (tiers[PRE_ICO_ID.add(1)].startTime > now || isICOFinished()) {
+            return 0;
+        }
         uint256 remainingValue = _amount;
 
-        for (uint i = 0; i < tiers.length; i++) {
-            if (
-                tiers[i].startTime != 0 && tiers[i].startTime >= now &&
-                tiers[i].endTime != 0 && tiers[i].endTime <= now &&
-                tiers[i].maxAmount > soldTokens
-            ) {
-                if (soldTokens.add(_amount) > tiers[i].maxAmount) {
-                    uint256 diff = tiers[i].maxAmount.sub(soldTokens);
-                    remainingValue = remainingValue.sub(diff);
-                    ethersAmount = ethersAmount.add(diff.mul(tiers[i].price).div(etherPriceInUSD));
-                } else {
-                    ethersAmount = ethersAmount.add(remainingValue.mul(tiers[i].price).div(etherPriceInUSD));
-                    remainingValue = 0;
-                }
+        for (uint i = PRE_ICO_ID.add(1); i < tiers.length; i++) {
 
-                if (remainingValue == 0) {
-                    break;
-                }
+            if (soldTokens.add(_amount) > tiers[i].maxAmount) {
+                uint256 diff = tiers[i].maxAmount.sub(soldTokens);
+                remainingValue = remainingValue.sub(diff);
+                ethersAmount = ethersAmount.add(diff.mul(tiers[i].price).div(etherPriceInUSD));
+            } else {
+                ethersAmount = ethersAmount.add(remainingValue.mul(tiers[i].price).div(etherPriceInUSD));
+                remainingValue = 0;
+            }
+
+            if (remainingValue == 0) {
+                break;
             }
         }
 
-        if (remainingValue > 0 || ethersAmount < ((uint256(10) ** DECIMALS).mul(minInvest).div(etherPriceInUSD))) {
+        if (remainingValue > 0 || ethersAmount < (uint256(1 ether).mul(minInvest).div(etherPriceInUSD))) {
             return 0;
         }
 
         return ethersAmount;
     }
 
-    function getStats(uint256 _ethPerBtc, uint256 _ethPerLtc) public returns (
+    function updateStateWithPrivateSale(uint256 _amount, address[] _investors) public {
+        if (_amount > 0 && msg.sender == address(privateSale)) {
+            Tier storage preICOTier = tiers[PRE_ICO_ID];
+            preICOTier.maxAmount = preICOTier.maxAmount.add(_amount);
+            maxTokenSupply = maxTokenSupply.add(_amount);
+
+            if (_investors.length > 0) {
+                for (uint256 i = 0; i < _investors.length; i++) {
+                    investors.push(_investors[i]);
+                }
+            }
+        }
+    }
+
+    function getMinEthersInvestment() public view returns (uint256) {
+        return uint256(1 ether).mul(minInvest).div(etherPriceInUSD);
+    }
+
+    function getStats(uint256 _ethPerBtc, uint256 _ethPerLtc) public view returns (
         uint256 start,
         uint256 end,
         uint256 sold,

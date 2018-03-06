@@ -17,11 +17,6 @@ var ICO = artifacts.require("./test/TestICO.sol"),
     multivestAddress = web3.eth.accounts[8],
     etherHolder = web3.eth.accounts[9];
 
-function makeTransaction(instance, value, add, from) {
-    "use strict";
-    return instance.multivestBuy(add, value, {from: from});
-}
-
 async function deploy() {
     const howdoo = await Howdoo.new(
         treasuryAddress,
@@ -53,6 +48,10 @@ async function deploy() {
 }
 
 contract('Allocations + vesting allocation', function (accounts) {
+
+    beforeEach(async function (done) {
+
+    });
 
     it('deploy & check constructor info & setHowdoo & setICO', async function () {
         const {howdoo, ico, allocation} = await deploy();
@@ -106,109 +105,110 @@ contract('Allocations + vesting allocation', function (accounts) {
         assert.equal(allocationData[0], accounts[0], "allocationData address is not equal");
         assert.equal(allocationData[1], new BigNumber('101210666.57').mul(precision).valueOf(), "allocationData tokens is not equal");
         assert.equal(allocationData[2], false, "allocationData sent is not equal");
-/*
-        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
-            accounts[0],
-            accounts[1],
-            accounts[2],
-        ], {from: accounts[5]})
-            .then(Utils.receiptShouldFailed)
-            .catch(Utils.catchReceiptShouldFailed);
+        /*
+                await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+                    accounts[0],
+                    accounts[1],
+                    accounts[2],
+                ], {from: accounts[5]})
+                    .then(Utils.receiptShouldFailed)
+                    .catch(Utils.catchReceiptShouldFailed);
 
-        await allocation.setAllocation(new BigNumber('0').mul(precision).valueOf(),[
-            accounts[0],
-            accounts[1],
-            accounts[2],
-        ])
-            .then(Utils.receiptShouldFailed)
-            .catch(Utils.catchReceiptShouldFailed);
+                await allocation.setAllocation(new BigNumber('0').mul(precision).valueOf(),[
+                    accounts[0],
+                    accounts[1],
+                    accounts[2],
+                ])
+                    .then(Utils.receiptShouldFailed)
+                    .catch(Utils.catchReceiptShouldFailed);
 
-        await allocation.testChangeRemainingTokens(0);
-        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
-            accounts[0],
-            accounts[1],
-            accounts[2],
-        ])
-            .then(Utils.receiptShouldFailed)
-            .catch(Utils.catchReceiptShouldFailed);
-        await allocation.testChangeRemainingTokens(new BigNumber('88888888.8').mul(precision).valueOf());
+                await allocation.testChangeRemainingTokens(0);
+                await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+                    accounts[0],
+                    accounts[1],
+                    accounts[2],
+                ])
+                    .then(Utils.receiptShouldFailed)
+                    .catch(Utils.catchReceiptShouldFailed);
+                await allocation.testChangeRemainingTokens(new BigNumber('88888888.8').mul(precision).valueOf());
 
-        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[])
-            .then(Utils.receiptShouldFailed)
-            .catch(Utils.catchReceiptShouldFailed);
+                await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[])
+                    .then(Utils.receiptShouldFailed)
+                    .catch(Utils.catchReceiptShouldFailed);
 
-        await allocation.testChangeRemainingTokens(new BigNumber('1').valueOf());
-        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
-            accounts[0],
-            accounts[1],
-            accounts[2],
-        ])
-            .then(Utils.receiptShouldFailed)
-            .catch(Utils.catchReceiptShouldFailed);
-        await allocation.testChangeRemainingTokens(new BigNumber('88888888.8').mul(precision).valueOf());
+                await allocation.testChangeRemainingTokens(new BigNumber('1').valueOf());
+                await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+                    accounts[0],
+                    accounts[1],
+                    accounts[2],
+                ])
+                    .then(Utils.receiptShouldFailed)
+                    .catch(Utils.catchReceiptShouldFailed);
+                await allocation.testChangeRemainingTokens(new BigNumber('88888888.8').mul(precision).valueOf());
 
-        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
-            accounts[0],
-            0x0,
-            accounts[2],
-        ])
-            .then(Utils.receiptShouldFailed)
-            .catch(Utils.catchReceiptShouldFailed);
+                await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+                    accounts[0],
+                    0x0,
+                    accounts[2],
+                ])
+                    .then(Utils.receiptShouldFailed)
+                    .catch(Utils.catchReceiptShouldFailed);
 
-        await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
-            accounts[1],
-            accounts[2],
-            accounts[3],
-        ])
-            .then(Utils.receiptShouldSucceed);
+                await allocation.setAllocation(new BigNumber('10000').mul(precision).valueOf(),[
+                    accounts[1],
+                    accounts[2],
+                    accounts[3],
+                ])
+                    .then(Utils.receiptShouldSucceed);
 
-        await allocation.claim({from: accounts[2]})
-            .then(Utils.receiptShouldSucceed);
+                await allocation.claim({from: accounts[2]})
+                    .then(Utils.receiptShouldSucceed);
 
-        allocationData = await allocation.testGetAllocationById.call(0);
-        assert.equal(allocationData[2], false, "allocationData sent is not equal");
-        allocationData = await allocation.testGetAllocationById.call(1);
-        assert.equal(allocationData[2], false, "allocationData sent is not equal");
-        allocationData = await allocation.testGetAllocationById.call(2);
-        assert.equal(allocationData[2], true, "allocationData sent is not equal");
-        allocationData = await allocation.testGetAllocationById.call(3);
-        assert.equal(allocationData[2], false, "allocationData sent is not equal");
+                allocationData = await allocation.testGetAllocationById.call(0);
+                assert.equal(allocationData[2], false, "allocationData sent is not equal");
+                allocationData = await allocation.testGetAllocationById.call(1);
+                assert.equal(allocationData[2], false, "allocationData sent is not equal");
+                allocationData = await allocation.testGetAllocationById.call(2);
+                assert.equal(allocationData[2], true, "allocationData sent is not equal");
+                allocationData = await allocation.testGetAllocationById.call(3);
+                assert.equal(allocationData[2], false, "allocationData sent is not equal");
 
-        await Utils.checkState({allocation, howdoo}, {
-            allocation: {
-                howdoo: howdoo.address,
-                ico: ico.address,
-                remainingTokens: new BigNumber('88888888.8').mul(precision).sub(new BigNumber('30000').mul(precision)).valueOf()
-            },
-            howdoo: {
-                balanceOf: [
-                    {[accounts[0]]: new BigNumber('0').mul(precision).valueOf()},
-                    {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
-                    {[accounts[2]]: new BigNumber('10000').mul(precision).valueOf()},
-                    {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
-                ],
-            }
-        });
+                await Utils.checkState({allocation, howdoo}, {
+                    allocation: {
+                        howdoo: howdoo.address,
+                        ico: ico.address,
+                        remainingTokens: new BigNumber('88888888.8').mul(precision).sub(new BigNumber('30000').mul(precision)).valueOf()
+                    },
+                    howdoo: {
+                        balanceOf: [
+                            {[accounts[0]]: new BigNumber('0').mul(precision).valueOf()},
+                            {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
+                            {[accounts[2]]: new BigNumber('10000').mul(precision).valueOf()},
+                            {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
+                        ],
+                    }
+                });
 
-        await allocation.claim({from: accounts[2]})
-            .then(Utils.receiptShouldSucceed);
+                await allocation.claim({from: accounts[2]})
+                    .then(Utils.receiptShouldSucceed);
 
-        await Utils.checkState({allocation, howdoo}, {
-            allocation: {
-                howdoo: howdoo.address,
-                ico: ico.address,
-                remainingTokens: new BigNumber('88888888.8').mul(precision).sub(new BigNumber('30000').mul(precision)).valueOf()
-            },
-            howdoo: {
-                balanceOf: [
-                    {[accounts[0]]: new BigNumber('0').mul(precision).valueOf()},
-                    {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
-                    {[accounts[2]]: new BigNumber('10000').mul(precision).valueOf()},
-                    {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
-                ],
-            }
-        });
-*/
+                await Utils.checkState({allocation, howdoo}, {
+                    allocation: {
+                        howdoo: howdoo.address,
+                        ico: ico.address,
+                        remainingTokens: new BigNumber('88888888.8').mul(precision).sub(new BigNumber('30000').mul(precision)).valueOf()
+                    },
+                    howdoo: {
+                        balanceOf: [
+                            {[accounts[0]]: new BigNumber('0').mul(precision).valueOf()},
+                            {[accounts[1]]: new BigNumber('0').mul(precision).valueOf()},
+                            {[accounts[2]]: new BigNumber('10000').mul(precision).valueOf()},
+                            {[accounts[3]]: new BigNumber('0').mul(precision).valueOf()},
+                        ],
+                    }
+                });
+        */
+
         await allocation.allocate({from: accounts[2]})
             .then(Utils.receiptShouldFailed)
             .catch(Utils.catchReceiptShouldFailed);
@@ -233,6 +233,7 @@ contract('Allocations + vesting allocation', function (accounts) {
 
         allocationData = await allocation.testGetAllocationById.call(0);
         assert.equal(allocationData[2], true, "allocationData sent is not equal");
+
         // allocationData = await allocation.testGetAllocationById.call(1);
         // assert.equal(allocationData[2], true, "allocationData sent is not equal");
         // allocationData = await allocation.testGetAllocationById.call(2);

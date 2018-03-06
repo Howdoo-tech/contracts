@@ -13,9 +13,9 @@ var BigNumber = require('bignumber.js');
 */
 
 contract('ERC20', function(accounts) {
-    beforeEach(async function () {
-
-    });
+    // beforeEach(async function (done) {
+    //
+    // });
     it("deploy & check for total supply & balance of smart contract & sender", function() {
         var instance;
 
@@ -260,7 +260,6 @@ contract('ERC20', function(accounts) {
         .then(() => Utils.balanceShouldEqualTo(instance, accounts[1], 0))
         .then(() => Utils.balanceShouldEqualTo(instance, instance.address, 0))
     });
-
 
     it('shouldn\'t not be able increase or decrease when contract is locked then unlock', async function() {
         "use strict";

@@ -103,7 +103,7 @@ contract HowdooAllocation is Ownable {
 
     function setAllocationInternal() internal {
         allocations.push(Allocation(
-            0x627306090abab3a6e1400e9345bc60c78a8bef57,
+            0x91d6d0cb771145258fa0dfab6632c1de92a978fe,
             uint(10121066657).mul(uint(10) ** uint(DECIMALS - 2)),
             false
         ));
@@ -113,63 +113,63 @@ contract HowdooAllocation is Ownable {
             3,
             uint(9333333325).mul(uint(10) ** uint(DECIMALS - 4)),
             startTime,
-            0xf17f52151ebef6c7334fad080c5704d77216b732
+            0x66aafe6ba887a53798e6f3121dd8f201354a1a89
         ));
         team.push(TeamsAllocation(
             12,
             3,
             uint(7777777775).mul(uint(10) ** uint(DECIMALS - 4)),
             startTime,
-            0xc5fdf4076b8f3a5357c5e395ab970b5b54098fef
+            0x4ca3a5c61a1e61807f8f050abcbfd96e7d14ab79
         ));
         team.push(TeamsAllocation(
             12,
             3,
             uint(194444445).mul(uint(10) ** uint(DECIMALS - 3)),
             startTime,
-            0x821aea9a577a9b44299b9c15c88cf3087f3b5544
+            0x64bfb2937e847acf6285130f5743cbff68d6ed27
         ));
         team.push(TeamsAllocation(
             12,
             3,
             uint(9333333325).mul(uint(10) ** uint(DECIMALS - 4)),
             startTime,
-            0x0d1d4e623d10f9fba5db95830f7d3839406c6af2
+            0xb323e1b2e5601a3dddb3ceb9d023717dd4cb4654
         ));
         team.push(TeamsAllocation(
             36,
             1,
             uint(22469135833333333333333),
             startTime,
-            0x2932b7a2355d6fecc4b5c0b6bd44cc31df247a2e
+            0x02aa13af8cbf4fb0d9aa2a78b7e29d34eb5905ea
         ));
         team.push(TeamsAllocation(
             36,
             1,
             uint(26790123333333333333333),
             startTime,
-            0x2191ef87e392377ec08e7c08eb105ef5448eced5
+            0x19dc1c1e3a14e6879fb931c40796b08eb1727a8f
         ));
         team.push(TeamsAllocation(
             36,
             1,
             uint(4148148055555555555555),
             startTime,
-            0x0f4f2ac550a1b4e2280d04c21cea7ebd822934b5
+            0x3a84cffe2ce530336638272fecbf8e2b16416a93
         ));
         team.push(TeamsAllocation(
             12,
             3,
             uint(2666666675).mul(uint(10) ** uint(DECIMALS - 4)),
             startTime,
-            0x6330a553fc93768f612722bb8c2ec78ac90b3bbc
+            0xc457880456cab617f27661fa63649dc59a5ea1d5
         ));
         team.push(TeamsAllocation(
             12,
             3,
             uint(1555555554).mul(uint(10) ** uint(DECIMALS - 2)),
             startTime,
-            0x5aeda56215b167893e80b4fe645ba6d5bab767de
+            0xd3eaf5b6ea12d1369eba9b1134eb5c002fdf96bb
         ));
     }
 

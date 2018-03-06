@@ -65,8 +65,6 @@ contract('Referral', function (accounts) {
 
     it("deploy & multivestMint", async function () {
         const {howdoo, ico, ref} = await deploy();
-        await ico.updateWhitelist(web3.eth.accounts[0], false);
-        await ico.updateWhitelist(web3.eth.accounts[1], false);
 
         await Utils.checkState({ico, howdoo, ref}, {
             ref: {
@@ -81,8 +79,6 @@ contract('Referral', function (accounts) {
             ico: {
                 minInvest: new BigNumber('25000000').valueOf(),
                 howdoo: howdoo.address,
-                startTime: icoSince,
-                endTime: icoTill,
                 maxTokenSupply: new BigNumber('311111110.8').mul(precision).valueOf(),
                 soldTokens: new BigNumber('0').valueOf(),
                 collectedEthers: new BigNumber('0').valueOf(),
@@ -91,11 +87,7 @@ contract('Referral', function (accounts) {
                 allowedMultivests: [
                     {[multivestAddress]: true},
                     {[bountyAddress]: false},
-                ],
-                whitelist: [
-                    {[accounts[0]]: false},
-                    {[accounts[1]]: false},
-                ],
+                ]
             }
         });
 
@@ -119,8 +111,6 @@ contract('Referral', function (accounts) {
             ico: {
                 minInvest: new BigNumber('25000000').valueOf(),
                 howdoo: howdoo.address,
-                startTime: icoSince,
-                endTime: icoTill,
                 maxTokenSupply: new BigNumber('311111110.8').mul(precision).valueOf(),
                 soldTokens: new BigNumber('0').valueOf(),
                 collectedEthers: new BigNumber('0').mul(precision).valueOf(),
@@ -129,11 +119,7 @@ contract('Referral', function (accounts) {
                 allowedMultivests: [
                     {[multivestAddress]: true},
                     {[bountyAddress]: false},
-                ],
-                whitelist: [
-                    {[accounts[0]]: false},
-                    {[accounts[1]]: false},
-                ],
+                ]
             }
         });
 
