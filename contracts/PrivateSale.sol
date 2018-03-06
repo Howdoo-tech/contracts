@@ -40,7 +40,6 @@ contract PrivateSale is SellableToken {
     }
 
     /* public methods */
-
     function() public payable {
         require(true == whitelist[msg.sender] && buyInternal(msg.sender, msg.value) == true);
     }
