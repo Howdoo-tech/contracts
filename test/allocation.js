@@ -43,15 +43,12 @@ async function deploy() {
     await howdoo.addMinter(ico.address);
     await howdoo.addMinter(allocation.address);
     await howdoo.setICO(ico.address);
+    await allocation.setICO(ico.address);
 
     return {howdoo, ico, allocation};
 }
 
 contract('Allocations + vesting allocation', function (accounts) {
-
-    beforeEach(async function (done) {
-
-    });
 
     it('deploy & check constructor info & setHowdoo & setICO', async function () {
         const {howdoo, ico, allocation} = await deploy();
@@ -92,12 +89,26 @@ contract('Allocations + vesting allocation', function (accounts) {
     it('check Allocation & claim & allocate', async function () {
         const {howdoo, ico, allocation} = await deploy();
 
+        await ico.changePreICODates(icoSince, icoTill);
         await Utils.checkState({allocation}, {
             allocation: {
                 howdoo: howdoo.address,
                 ico: ico.address
             }
         });
+
+        allocation.testSetAllocation([
+            accounts[0],
+            accounts[1],
+            accounts[2],
+            accounts[3],
+            accounts[4],
+            accounts[5],
+            accounts[6],
+            accounts[7],
+            accounts[8],
+            accounts[9],
+        ]);
 
         assert.equal(await allocation.testGetAllocationsLength.call(), 1, "AllocationsLength is not equal");
 
@@ -245,6 +256,20 @@ contract('Allocations + vesting allocation', function (accounts) {
     it('check vesting allocations', async function () {
         const {howdoo, ico, allocation} = await deploy();
 
+        await ico.changePreICODates(icoSince, icoTill);
+        allocation.testSetAllocation([
+            accounts[0],
+            accounts[1],
+            accounts[2],
+            accounts[3],
+            accounts[4],
+            accounts[5],
+            accounts[6],
+            accounts[7],
+            accounts[8],
+            accounts[9],
+        ]);
+
         await Utils.checkState({allocation, howdoo}, {
             howdoo: {
                 balanceOf: [
@@ -297,7 +322,7 @@ contract('Allocations + vesting allocation', function (accounts) {
             }
         });
 
-        await ico.testChangeICOPeriod(icoSince - monthSeconds, icoTill);
+        await ico.changePreICODates(icoSince - monthSeconds, icoTill);
         allocation.testAllocate(parseInt(new Date().getTime() / 1000) + monthSeconds)
             .then(Utils.receiptShouldSucceed);
 
