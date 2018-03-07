@@ -98,6 +98,10 @@ contract('Referral', function (accounts) {
         await makeTransaction(ref, signAddress, accounts[1], new BigNumber('1000').valueOf())
             .then(Utils.receiptShouldSucceed);
 
+        await makeTransaction(ref, signAddress, accounts[1], new BigNumber('1000').valueOf())
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+
         await Utils.checkState({ico, howdoo, ref}, {
             ref: {
                 totalSupply: new BigNumber('21111111.08').sub('1000').mul(precision).valueOf()

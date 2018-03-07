@@ -13,6 +13,8 @@ contract Referral is Multivest {
 
     uint256 public totalSupply = 2111111108 * 10 ** DECIMALS.sub(2);
 
+    mapping (address => bool) public claimed;
+
     /* constructor */
     function Referral(
         address _howdoo,
@@ -36,6 +38,7 @@ contract Referral is Multivest {
     ) public onlyAllowedMultivests(verify(keccak256(msg.sender, _amount), _v, _r, _s)) {
         _amount = _amount.mul(10 ** DECIMALS);
         require(
+            claimed[_address] == false &&
             _address == msg.sender &&
             _amount > 0 &&
             _amount <= totalSupply &&
@@ -43,6 +46,7 @@ contract Referral is Multivest {
         );
 
         totalSupply = totalSupply.sub(_amount);
+        claimed[_address] = true;
     }
 
     function buy(address _address, uint256 value) internal returns (bool) {
