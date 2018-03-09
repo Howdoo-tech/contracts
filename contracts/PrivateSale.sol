@@ -41,7 +41,7 @@ contract PrivateSale is SellableToken {
 
     /* public methods */
     function() public payable {
-        require(true == whitelist[msg.sender] && buyInternal(msg.sender, msg.value) == true);
+        require(true == whitelist[msg.sender] && buy(msg.sender, msg.value) == true);
     }
 
     function setICO(address _ico) public onlyOwner {
@@ -129,7 +129,7 @@ contract PrivateSale is SellableToken {
         priceValue = price;
     }
 
-    function buyInternal(address _address, uint256 _value) internal returns (bool) {
+    function buy(address _address, uint256 _value) internal returns (bool) {
         if (_value == 0) {
             return false;
         }
@@ -149,11 +149,6 @@ contract PrivateSale is SellableToken {
 
         transferEthers();
         return true;
-    }
-
-    function buy(address _address, uint256 _value) internal returns (bool) {
-        _address = _address;
-        _value = _value;
     }
 
 }

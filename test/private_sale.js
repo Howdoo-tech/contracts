@@ -545,4 +545,60 @@ contract('PrivateSale', function (accounts) {
 
         assert.equal(stats[7][0], new BigNumber('133333333.2').add('44444444.4').mul(precision).sub('23898600000000000000000').valueOf(), "maxAmount is not equal");
     });
+
+    it("check multivestBuyKYC", async function () {
+        const {howdoo, privateSale} = await deploy();
+
+        await Utils.checkState({privateSale, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[0]]: new BigNumber('0').valueOf()},
+                    {[accounts[1]]: new BigNumber('0').valueOf()},
+                ],
+            },
+            privateSale: {
+                minInvest: new BigNumber('25000000').valueOf(),
+                howdoo: howdoo.address,
+                maxTokenSupply: new BigNumber('44444444.4').mul(precision).valueOf(),
+                soldTokens: new BigNumber('0').valueOf(),
+                collectedEthers: new BigNumber('0').valueOf(),
+                etherPriceInUSD: new BigNumber('119493000').valueOf(),
+                etherHolder: etherHolder,
+                allowedMultivests: [
+                    {[multivestAddress]: true},
+                    {[bountyAddress]: false},
+                ]
+            }
+        });
+
+        await makeTransactionKYC(privateSale, wrongSigAddress, accounts[0], new BigNumber('1').mul(precision).valueOf())
+            .then(Utils.receiptShouldFailed)
+            .catch(Utils.catchReceiptShouldFailed);
+
+        await makeTransactionKYC(privateSale, signAddress, accounts[0], new BigNumber('1').mul(precision).valueOf())
+            .then(Utils.receiptShouldSucceed);
+
+        await Utils.checkState({privateSale, howdoo}, {
+            howdoo: {
+                balanceOf: [
+                    {[accounts[0]]: new BigNumber('23898600000000000000000').valueOf()},
+                    {[accounts[1]]: new BigNumber('0').valueOf()},
+                ],
+            },
+            privateSale: {
+                minInvest: new BigNumber('25000000').valueOf(),
+                howdoo: howdoo.address,
+                maxTokenSupply: new BigNumber('44444444.4').mul(precision).valueOf(),
+                soldTokens: new BigNumber('23898600000000000000000').valueOf(),
+                collectedEthers: new BigNumber('1').mul(precision).valueOf(),
+                etherPriceInUSD: new BigNumber('119493000').valueOf(),
+                etherHolder: etherHolder,
+                allowedMultivests: [
+                    {[multivestAddress]: true},
+                    {[bountyAddress]: false},
+                ]
+            }
+        });
+
+    });
 });
