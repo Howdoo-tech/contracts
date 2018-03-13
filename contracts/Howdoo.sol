@@ -23,15 +23,11 @@ contract Howdoo is MintingERC20 {
         address _treasuryAddress,
         address _hisAddress,
         address _bountyAddress,
-        address _allowedAddress,
         bool _locked
     )
         public MintingERC20(0, maxSupply, "uDOO", 18, "uDOO", false, _locked)
     {
         standard = "uDOO 0.1";
-
-        require(address(0) != _allowedAddress);
-        allowedAddress = _allowedAddress;
 
         maxSupply = uint(888888888).mul(uint(10) ** decimals);
 
@@ -41,6 +37,11 @@ contract Howdoo is MintingERC20 {
     function setICO(address _ico) public onlyOwner {
         require(_ico != address(0));
         ico = ICO(_ico);
+    }
+
+    function setAllowedAddress(address _allowedAddress) public onlyOwner {
+        require(_allowedAddress != address(0));
+        allowedAddress = _allowedAddress;
     }
 
     function setLocked(bool _locked) public onlyOwner {

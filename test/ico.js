@@ -40,7 +40,6 @@ async function deploy() {
         treasuryAddress,
         hisAddress,
         bountyAddress,
-        allowedAddress,
         false
     );
 
@@ -66,6 +65,7 @@ async function deploy() {
 
     await howdoo.addMinter(ico.address);
     await howdoo.setICO(ico.address);
+    await howdoo.setAllowedAddress(allowedAddress);
 
     // await howdoo.addMinter(privateSale.address);
     // await howdoo.setICO(privateSale.address);

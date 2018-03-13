@@ -39,7 +39,6 @@ async function deploy() {
         treasuryAddress,
         hisAddress,
         bountyAddress,
-        allowedAddress,
         false
     );
     const ico = await ICO.new(
@@ -57,6 +56,7 @@ async function deploy() {
     await howdoo.addMinter(ico.address);
     await howdoo.addMinter(ref.address);
     await howdoo.setICO(ico.address);
+    await howdoo.setAllowedAddress(allowedAddress);
 
     return {howdoo, ico, ref};
 }

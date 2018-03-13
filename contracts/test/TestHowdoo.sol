@@ -10,14 +10,12 @@ contract TestHowdoo is Howdoo {
         address _treasuryAddress,
         address _hisAddress,
         address _bountyAddress,
-        address _allowedAddress,
         bool _locked
     )
     public Howdoo(
          _treasuryAddress,
          _hisAddress,
          _bountyAddress,
-         _allowedAddress,
          _locked
         )
     {

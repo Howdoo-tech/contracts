@@ -48,7 +48,7 @@ contract MintingERC20 is HowdooERC20 {
     }
 
     function mint(address _addr, uint256 _amount) public onlyMinters returns (uint256) {
-        if (true == disableMinting) {
+        if (true == locked) {
             return uint256(0);
         }
 
