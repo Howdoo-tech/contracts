@@ -97,12 +97,12 @@ contract ICO is SellableToken {
         }
 
         uint256 amount;
-        if (isPreICOActive()) {
+        if (isPreICOActive() || tiers[PRE_ICO_ID].startTime > now) {
             amount = _value.mul(etherPriceInUSD).div(tiers[i].price);
             return soldTokens.add(amount) <= tiers[PRE_ICO_ID].maxAmount ? amount : 0;
         }
 
-        if (tiers[PRE_ICO_ID.add(1)].startTime > now || isICOFinished()) {
+        if (isICOFinished()) {
             return 0;
         }
         uint256 newSoldTokens = soldTokens;
@@ -137,7 +137,7 @@ contract ICO is SellableToken {
             return 0;
         }
         uint256 ethersAmount;
-        if (isPreICOActive()) {
+        if (isPreICOActive() || tiers[PRE_ICO_ID].startTime > now) {
             ethersAmount = _amount.mul(tiers[i].price).div(etherPriceInUSD);
             if (
                 ethersAmount < (uint256(1 ether).mul(minInvest).div(etherPriceInUSD)) ||
@@ -148,7 +148,7 @@ contract ICO is SellableToken {
             return ethersAmount;
         }
 
-        if (tiers[PRE_ICO_ID.add(1)].startTime > now || isICOFinished()) {
+        if (isICOFinished()) {
             return 0;
         }
         uint256 remainingValue = _amount;

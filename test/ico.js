@@ -184,10 +184,10 @@ contract('ICO', function (accounts) {
 
         await ico.changePreICODates(parseInt(new Date().getTime() / 1000 - 7200), parseInt(new Date().getTime() / 1000 - 3600));
 
-        assert.equal(await ico.testCalculateTokensAmount.call(
-            new BigNumber('1').mul(precision).valueOf(),
-            new BigNumber('0').mul(precision).valueOf()
-        ), new BigNumber('0').valueOf(), "value is not equal");
+        // assert.equal(await ico.testCalculateTokensAmount.call(
+        //     new BigNumber('1').mul(precision).valueOf(),
+        //     new BigNumber('0').mul(precision).valueOf()
+        // ), new BigNumber('0').valueOf(), "value is not equal");
         //check preICO END
 
 
