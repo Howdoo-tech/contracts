@@ -91,7 +91,7 @@ contract ICO is SellableToken {
         }
     }
 
-    function calculateTokensAmount(uint256 _value) public returns (uint256) {
+    function calculateTokensAmount(uint256 _value) public constant returns (uint256) {
         if (_value == 0 || _value < (uint256(1 ether).mul(minInvest).div(etherPriceInUSD))) {
             return 0;
         }

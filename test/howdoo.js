@@ -45,9 +45,7 @@ async function deploy() {
 }
 
 contract('Token', function (accounts) {
-    // beforeEach(async function (done) {
-    //
-    // });
+
     it("deploy & check constructor info && initialAllocation & setICO & setLocked & transfer & approve & transferFrom & transferAllowed", async function () {
         const {howdoo, ico} = await deploy();
 
@@ -105,8 +103,8 @@ contract('Token', function (accounts) {
 
         await howdoo.testSetFreezing(false);
 
-        assert.equal(await howdoo.transferAllowed.call(accounts[1]), true, 'transferAllowed is not equal')
-        assert.equal(await howdoo.transferAllowed.call(bountyAddress), true, 'transferAllowed is not equal')
+        assert.equal(await howdoo.transferAllowed.call(accounts[1]), true, 'transferAllowed is not equal');
+        assert.equal(await howdoo.transferAllowed.call(bountyAddress), true, 'transferAllowed is not equal');
 
         await howdoo.addMinter(accounts[3]);
 
@@ -141,8 +139,14 @@ contract('Token', function (accounts) {
             }
         });
 
+        await howdoo.setLocked(false)
+            .then(Utils.receiptShouldSucceed);
+
         await howdoo.mint(accounts[0], 1000, {from: accounts[3]})
             .then(() => Utils.balanceShouldEqualTo(howdoo, accounts[0], 1000));
+
+        await howdoo.setLocked(true)
+            .then(Utils.receiptShouldSucceed);
 
         await howdoo.transfer(accounts[1], 500)
             .then(Utils.receiptShouldFailed)
