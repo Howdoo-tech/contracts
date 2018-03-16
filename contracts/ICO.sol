@@ -198,6 +198,7 @@ contract ICO is SellableToken {
         uint256 start,
         uint256 end,
         uint256 sold,
+        uint256 totalSoldTokens,
         uint256 maxSupply,
         uint256 tokensPerEth,
         uint256 tokensPerBtc,
@@ -207,6 +208,10 @@ contract ICO is SellableToken {
         start = tiers[PRE_ICO_ID].startTime;
         end = tiers[tiers.length.sub(1)].endTime;
         sold = soldTokens;
+        totalSoldTokens = soldTokens;
+        if (address(privateSale) != address(0)) {
+            totalSoldTokens = totalSoldTokens.add(privateSale.soldTokens());
+        }
         maxSupply = maxTokenSupply;
         tokensPerEth = calculateTokensAmount(1 ether);
         tokensPerBtc = calculateTokensAmount(_ethPerBtc);

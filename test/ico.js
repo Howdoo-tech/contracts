@@ -52,16 +52,16 @@ async function deploy() {
         new BigNumber('311111110.8').mul(precision).valueOf(),//_maxTokenSupply
     );
 
-    // const privateSale = await PrivateSale.new(
-    //     multivestAddress,
-    //     howdoo.address,
-    //     etherHolder,
-    //     icoSince,
-    //     icoTill,
-    //     new BigNumber('119493000').valueOf(),//1,194.930008
-    //     new BigNumber('25000000').valueOf(),//25000000
-    //     new BigNumber('311111110.8').mul(precision).valueOf(),//_maxTokenSupply
-    // );
+    const privateSale = await PrivateSale.new(
+        multivestAddress,
+        howdoo.address,
+        etherHolder,
+        icoSince,
+        icoTill,
+        new BigNumber('119493000').valueOf(),//1,194.930008
+        new BigNumber('25000000').valueOf(),//25000000
+        new BigNumber('311111110.8').mul(precision).valueOf(),//_maxTokenSupply
+    );
 
     await howdoo.addMinter(ico.address);
     await howdoo.setICO(ico.address);
@@ -70,7 +70,7 @@ async function deploy() {
     // await howdoo.addMinter(privateSale.address);
     // await howdoo.setICO(privateSale.address);
 
-    return {howdoo, ico};
+    return {howdoo, ico, privateSale};
 }
 
 contract('ICO', function (accounts) {
@@ -370,7 +370,7 @@ contract('ICO', function (accounts) {
     });
 
     it("check getStats", async function () {
-        const {howdoo, ico} = await deploy();
+        const {howdoo, ico, privateSale} = await deploy();
         let preICOStart = parseInt(new Date().getTime() / 1000) - 7200,
             preICOEnd = parseInt(new Date().getTime() / 1000) + 7200,
             ICOStart = parseInt(new Date().getTime() / 1000) + 7200 * 2,
@@ -383,23 +383,24 @@ contract('ICO', function (accounts) {
         assert.equal(stats[0], new BigNumber(preICOStart).valueOf(), "startTime is not equal");
         assert.equal(stats[1], new BigNumber(ICOEnd).valueOf(), "endTime is not equal");
         assert.equal(stats[2], new BigNumber('0').mul(precision).valueOf(), "soldTokens is not equal");
-        assert.equal(stats[3], new BigNumber('311111110.8').mul(precision).valueOf(), "maxTokenSupply is not equal");
-        assert.equal(stats[4], new BigNumber('14936625000000000000000').valueOf(), "tokensPerEth is not equal");
-        assert.equal(stats[5], new BigNumber('44809875000000000000000').valueOf(), "tokensPerBtc is not equal");
-        assert.equal(stats[6], new BigNumber('29873250000000000000000').valueOf(), "tokensPerLtc is not equal");
+        assert.equal(stats[3], new BigNumber('0').mul(precision).valueOf(), "totalsoldTokens is not equal");
+        assert.equal(stats[4], new BigNumber('311111110.8').mul(precision).valueOf(), "maxTokenSupply is not equal");
+        assert.equal(stats[5], new BigNumber('14936625000000000000000').valueOf(), "tokensPerEth is not equal");
+        assert.equal(stats[6], new BigNumber('44809875000000000000000').valueOf(), "tokensPerBtc is not equal");
+        assert.equal(stats[7], new BigNumber('29873250000000000000000').valueOf(), "tokensPerLtc is not equal");
 
-        assert.equal(stats[7][0], new BigNumber('133333333.2').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][1], new BigNumber('8000').valueOf(), "price is not equal");
-        assert.equal(stats[7][2], new BigNumber(preICOStart).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][3], new BigNumber(preICOEnd).valueOf(), "endTime is not equal");
-        assert.equal(stats[7][4], new BigNumber('222222222').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][5], new BigNumber('9000').valueOf(), "price is not equal");
-        assert.equal(stats[7][6], new BigNumber(ICOStart).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][7], new BigNumber(0).valueOf(), "endTime is not equal");
-        assert.equal(stats[7][8], new BigNumber('266666666.4').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][9], new BigNumber('10000').valueOf(), "price is not equal");
-        assert.equal(stats[7][10], new BigNumber(0).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][11], new BigNumber(ICOEnd).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][0], new BigNumber('133333333.2').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][1], new BigNumber('8000').valueOf(), "price is not equal");
+        assert.equal(stats[8][2], new BigNumber(preICOStart).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][3], new BigNumber(preICOEnd).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][4], new BigNumber('222222222').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][5], new BigNumber('9000').valueOf(), "price is not equal");
+        assert.equal(stats[8][6], new BigNumber(ICOStart).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][7], new BigNumber(0).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][8], new BigNumber('266666666.4').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][9], new BigNumber('10000').valueOf(), "price is not equal");
+        assert.equal(stats[8][10], new BigNumber(0).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][11], new BigNumber(ICOEnd).valueOf(), "endTime is not equal");
 
         preICOStart = parseInt(new Date().getTime() / 1000) - 7200 * 2;
         preICOEnd = parseInt(new Date().getTime() / 1000) - 7200;
@@ -408,28 +409,34 @@ contract('ICO', function (accounts) {
         await ico.changePreICODates(preICOStart, preICOEnd);
         await ico.changeICODates(ICOStart, ICOEnd);
         await ico.testChangeSoldTokens(new BigNumber('222222222').mul(precision).valueOf());
+        await privateSale.testChangeSoldTokens(new BigNumber('28282828').mul(precision).valueOf());
 
         stats = await ico.getStats(new BigNumber('3').mul(precision).valueOf(), new BigNumber('2').mul(precision).valueOf());
+        assert.equal(stats[3], new BigNumber('222222222').mul(precision).valueOf(), "totalsoldTokens is not equal");
+        await ico.setPrivateSale(privateSale.address);
+        stats = await ico.getStats(new BigNumber('3').mul(precision).valueOf(), new BigNumber('2').mul(precision).valueOf());
+
         assert.equal(stats[0], new BigNumber(preICOStart).valueOf(), "startTime is not equal");
         assert.equal(stats[1], new BigNumber(ICOEnd).valueOf(), "endTime is not equal");
         assert.equal(stats[2], new BigNumber('222222222').mul(precision).valueOf(), "soldTokens is not equal");
-        assert.equal(stats[3], new BigNumber('311111110.8').mul(precision).valueOf(), "maxTokenSupply is not equal");
-        assert.equal(stats[4], new BigNumber('11949300000000000000000').valueOf(), "tokensPerEth is not equal");
-        assert.equal(stats[5], new BigNumber('35847900000000000000000').valueOf(), "tokensPerBtc is not equal");
-        assert.equal(stats[6], new BigNumber('23898600000000000000000').valueOf(), "tokensPerLtc is not equal");
+        assert.equal(stats[3], new BigNumber('222222222').add('28282828').mul(precision).valueOf(), "totalsoldTokens is not equal");
+        assert.equal(stats[4], new BigNumber('311111110.8').mul(precision).valueOf(), "maxTokenSupply is not equal");
+        assert.equal(stats[5], new BigNumber('11949300000000000000000').valueOf(), "tokensPerEth is not equal");
+        assert.equal(stats[6], new BigNumber('35847900000000000000000').valueOf(), "tokensPerBtc is not equal");
+        assert.equal(stats[7], new BigNumber('23898600000000000000000').valueOf(), "tokensPerLtc is not equal");
 
-        assert.equal(stats[7][0], new BigNumber('133333333.2').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][1], new BigNumber('8000').valueOf(), "price is not equal");
-        assert.equal(stats[7][2], new BigNumber(preICOStart).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][3], new BigNumber(preICOEnd).valueOf(), "endTime is not equal");
-        assert.equal(stats[7][4], new BigNumber('222222222').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][5], new BigNumber('9000').valueOf(), "price is not equal");
-        assert.equal(stats[7][6], new BigNumber(ICOStart).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][7], new BigNumber(0).valueOf(), "endTime is not equal");
-        assert.equal(stats[7][8], new BigNumber('266666666.4').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][9], new BigNumber('10000').valueOf(), "price is not equal");
-        assert.equal(stats[7][10], new BigNumber(0).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][11], new BigNumber(ICOEnd).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][0], new BigNumber('133333333.2').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][1], new BigNumber('8000').valueOf(), "price is not equal");
+        assert.equal(stats[8][2], new BigNumber(preICOStart).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][3], new BigNumber(preICOEnd).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][4], new BigNumber('222222222').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][5], new BigNumber('9000').valueOf(), "price is not equal");
+        assert.equal(stats[8][6], new BigNumber(ICOStart).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][7], new BigNumber(0).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][8], new BigNumber('266666666.4').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][9], new BigNumber('10000').valueOf(), "price is not equal");
+        assert.equal(stats[8][10], new BigNumber(0).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][11], new BigNumber(ICOEnd).valueOf(), "endTime is not equal");
 
     });
 
@@ -482,18 +489,18 @@ contract('ICO', function (accounts) {
 
         assert.equal(await ico.isPreICOActive.call().valueOf(), false, "isPreICOActive not equal");
 
-        assert.equal(stats[7][0], new BigNumber('133333333.2').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][1], new BigNumber('8000').valueOf(), "price is not equal");
-        assert.equal(stats[7][2], new BigNumber(1522238340).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][3], new BigNumber(1524052740).valueOf(), "endTime is not equal");
-        assert.equal(stats[7][4], new BigNumber('222222222').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][5], new BigNumber('9000').valueOf(), "price is not equal");
-        assert.equal(stats[7][6], new BigNumber(1524916740).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][7], new BigNumber(0).valueOf(), "endTime is not equal");
-        assert.equal(stats[7][8], new BigNumber('266666666.4').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][9], new BigNumber('10000').valueOf(), "price is not equal");
-        assert.equal(stats[7][10], new BigNumber(0).valueOf(), "startTime is not equal");
-        assert.equal(stats[7][11], new BigNumber(1527335940).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][0], new BigNumber('133333333.2').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][1], new BigNumber('8000').valueOf(), "price is not equal");
+        assert.equal(stats[8][2], new BigNumber(1522238340).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][3], new BigNumber(1524052740).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][4], new BigNumber('222222222').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][5], new BigNumber('9000').valueOf(), "price is not equal");
+        assert.equal(stats[8][6], new BigNumber(1524916740).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][7], new BigNumber(0).valueOf(), "endTime is not equal");
+        assert.equal(stats[8][8], new BigNumber('266666666.4').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][9], new BigNumber('10000').valueOf(), "price is not equal");
+        assert.equal(stats[8][10], new BigNumber(0).valueOf(), "startTime is not equal");
+        assert.equal(stats[8][11], new BigNumber(1527335940).valueOf(), "endTime is not equal");
 
         let preICOStart = parseInt(new Date().getTime() / 1000) - 7200,
             preICOEnd = parseInt(new Date().getTime() / 1000) + 7200,
@@ -517,8 +524,8 @@ contract('ICO', function (accounts) {
         assert.equal(await ico.isPreICOActive.call().valueOf(), false, "isPreICOActive not equal");
         stats = await ico.getStats(new BigNumber('3').mul(precision).valueOf(), new BigNumber('2').mul(precision).valueOf());
 
-        assert.equal(stats[7][0], new BigNumber('33333333.2').mul(precision).valueOf(), "maxAmount is not equal");
-        assert.equal(stats[7][4], new BigNumber('222222222').add('100000000').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][0], new BigNumber('33333333.2').mul(precision).valueOf(), "maxAmount is not equal");
+        assert.equal(stats[8][4], new BigNumber('222222222').add('100000000').mul(precision).valueOf(), "maxAmount is not equal");
 
         //test isICOFinished
         ICOStart = parseInt(new Date().getTime() / 1000) - 7200 * 2;
