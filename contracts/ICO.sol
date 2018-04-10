@@ -30,15 +30,15 @@ contract ICO is SellableToken {
             Tier(
                 uint256(1333333332).mul(uint256(10) ** DECIMALS.sub(1)),
                 uint256(8000),
-                1522238340,
-                1524052740
+                1522839540,
+                1524657540
             )
         );//@ 0,08 USD
         tiers.push(
             Tier(
                 uint256(222222222).mul(uint256(10) ** DECIMALS),
                 uint256(9000),
-                1524916740,
+                1525521540,
                 0
             )
         );//@ 0,09 USD
@@ -47,12 +47,12 @@ contract ICO is SellableToken {
                 uint256(2666666664).mul(uint256(10) ** DECIMALS.sub(1)),
                 uint256(10000),
                 0,
-                1527335940
+                1527940740
             )
         );//@ 0,10 USD
 
-        startTime = 1522238340;
-        endTime = 1527335940;
+        startTime = 1522839540;
+        endTime = 1527940740;
     }
 
     /* public methods */
